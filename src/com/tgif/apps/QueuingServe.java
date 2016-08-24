@@ -18,11 +18,13 @@ import javax.swing.JOptionPane;
  * @author Mon
  */
 public class QueuingServe extends javax.swing.JFrame {
-    
+
     private String[] header = {"Item Description", "Qty"};
     private boolean[] cellEditable = {false, false};
     private int[] width = {378, 40};
     private List<Integer> id;
+    private TaskRunner taskRunner = new TaskRunner();
+
     /**
      * Creates new form Kitchen
      */
@@ -32,22 +34,22 @@ public class QueuingServe extends javax.swing.JFrame {
         initTables();
         threading();
     }
-    
+
     private void threading() {
-        TaskRunner taskRunner = new TaskRunner();
         taskRunner.setTask(new QueuingServe.TaskMenu());
-        taskRunner.setDelay(10000);
+        taskRunner.setDelay(5000);
         taskRunner.run();
     }
-    
+
     private class TaskMenu implements Task {
 
         @Override
         public void queTask() {
             getOrders("9");
+            System.out.println("1");
         }
     }
-    
+
     private void initTables() {
         TableManager.setModel(jXTable1, jScrollPane1, null, header, false, false, 0, cellEditable, width);
         TableManager.setModel(jXTable2, jScrollPane2, null, header, false, false, 0, cellEditable, width);
@@ -56,31 +58,31 @@ public class QueuingServe extends javax.swing.JFrame {
         TableManager.setModel(jXTable5, jScrollPane5, null, header, false, false, 0, cellEditable, width);
         TableManager.setModel(jXTable6, jScrollPane6, null, header, false, false, 0, cellEditable, width);
         jXTable1.setRowHeight(jXTable1.getRowHeight() * 2);
-    }   
-    
+    }
+
     private void getOrders(String tableNumber) {
         TableManager.getTableModel(jXTable1).setRowCount(0);
         ServeDao serveDao = new ServeDao();
 //        List<OrderDetail> orderDetail = new ArrayList<>();
         id = new ArrayList<>();
-        for(OrderDetail orderDetail: serveDao.getDetailOrders(tableNumber)) {
+        for (OrderDetail orderDetail : serveDao.getDetailOrders(tableNumber)) {
             id.add(orderDetail.getId());
-            String sauces="";
+            String sauces = "";
             for (int i = 0; i < orderDetail.getSauces().size(); i++) {
                 sauces += orderDetail.getSauces().get(i).getAbbreviation() + ", ";
             }
             String subSauces = sauces.substring(0, sauces.length() - 2);
-            String description = orderDetail.getServing().getAbbreviation() + 
-                    ", Sauce/s: " + subSauces +
-                    ", Side Dish: " + orderDetail.getSideDish().getAbbreviation();
+            String description = orderDetail.getServing().getAbbreviation()
+                    + ", Sauce/s: " + subSauces
+                    + ", Side Dish: " + orderDetail.getSideDish().getAbbreviation();
             TableManager.getTableModel(jXTable1).addRow(new Object[]{
-                orderDetail.getFoodItem().getItemName() + ", Serving: " + 
-                description,
+                orderDetail.getFoodItem().getItemName() + ", Serving: "
+                + description,
                 orderDetail.getQty()
             });
         }
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -186,6 +188,11 @@ public class QueuingServe extends javax.swing.JFrame {
         jXTable1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jXTable1.setShowHorizontalLines(false);
         jXTable1.setShowVerticalLines(false);
+        jXTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jXTable1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jXTable1);
 
         jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 440, 310));
@@ -323,14 +330,19 @@ public class QueuingServe extends javax.swing.JFrame {
     private void jButtonServe1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonServe1ActionPerformed
 //        System.out.println("row; "+jXTable1.getSelectedRow());
 //        System.out.println("id: "+id.get(jXTable1.getSelectedRow()));
+
         if (jXTable1.getSelectedRow() < 0) {
             JOptionPane.showMessageDialog(this, "Select data to serve");
-            return;
+        } else {
+            ServeDao serveDao = new ServeDao();
+            serveDao.edit(String.valueOf(id.get(jXTable1.getSelectedRow())));
+            taskRunner.run();
         }
-        ServeDao serveDao = new ServeDao();
-        serveDao.edit(String.valueOf(id.get(jXTable1.getSelectedRow())));
-        threading();
+
     }//GEN-LAST:event_jButtonServe1ActionPerformed
+
+    private void jXTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jXTable1MouseClicked
+    }//GEN-LAST:event_jXTable1MouseClicked
 
     /**
      * @param args the command line arguments

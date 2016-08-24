@@ -8,6 +8,14 @@ import com.tgif.dao.CategoryDao;
 import com.tgif.dao.FoodItemsDao;
 import com.tgif.model.Category;
 import com.tgif.model.FoodItem;
+import com.tgif.model.Sauce;
+import com.tgif.model.Serving;
+import com.tgif.model.SideDish;
+import java.awt.event.KeyEvent;
+import static java.awt.image.ImageObserver.WIDTH;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 /**
@@ -15,13 +23,30 @@ import javax.swing.JOptionPane;
  * @author Mon
  */
 public class FormFoodItem extends javax.swing.JDialog {
-    
-    private FoodItem foodItem;
-    private String formAction = "edit";
 
+    private FoodItem foodItem;
+    private List<String> itemNames;
+    private String formAction = "add";
+    private DefaultListModel<String> listServings;
+    private DefaultListModel<Double> listPrices;
+    private DefaultListModel<String> listSauces;
+    private DefaultListModel<String> listSideDishes;
+    private List<Integer> servingIds;
+    private List<Integer> sauceIds;
+    private List<Integer> sideDishIds;
+    private List<Integer> rServingIds;
+    private List<Integer> rSauceIds;
+    private List<Integer> rSideDishIds;
+    
     public void setFoodItem(FoodItem foodItem) {
         this.foodItem = foodItem;
     }
+
+    public void setItemNames(List<String> itemNames) {
+        this.itemNames = itemNames;
+    }
+    
+
     /**
      * Creates new form FormFoodItem
      */
@@ -30,21 +55,65 @@ public class FormFoodItem extends javax.swing.JDialog {
         initComponents();
         jTextFieldItemId.setVisible(false);
         jComboBoxCategoryId.setVisible(false);
+        listServings = new DefaultListModel<>();
+        listPrices = new DefaultListModel<>();
+        listSauces = new DefaultListModel<>();
+        listSideDishes = new DefaultListModel<>();
+        
         getCategory();
     }
-    
+
     public void setData() {
         if (this.foodItem != null) {
             jTextFieldItemId.setText(String.valueOf(this.foodItem.getItemId()));
             jTextFieldName.setText(this.foodItem.getItemName());
             jComboBoxCategory.setSelectedItem(this.foodItem.getCategory().getName());
-            jTextField2.setText(this.foodItem.getImage());
+            jTextFieldimage.setText(this.foodItem.getImage());
             jTextAreaDescription.setText(this.foodItem.getDescription());
             this.formAction = "edit";
+
+            FoodItemsDao foodItemsDao = new FoodItemsDao();
+            this.foodItem = foodItemsDao.getFoodItemDetails(Integer.valueOf(jTextFieldItemId.getText()));
+            System.out.println("servings:: " + this.foodItem.getServings().size());
+            List<Serving> servings = this.foodItem.getServings();
+            servingIds = new ArrayList<>();
+            if (servings.size() > 0) {
+                for (int i = 0; i < servings.size(); i++) {
+                    servingIds.add(servings.get(i).getServingId());
+                    listServings.addElement(servings.get(i).getServingName());
+                    listPrices.addElement(servings.get(i).getPrice());
+                    jListServing.setModel(listServings);
+                    jListPrice.setModel(listPrices);
+                }
+            }
+            System.out.println("sauces:: " + this.foodItem.getSauces().size());
+            List<Sauce> sauces = this.foodItem.getSauces();
+            sauceIds = new ArrayList<>();
+            if (sauces.size() > 0) {
+                for (int i = 0; i < sauces.size(); i++) {
+                    sauceIds.add(sauces.get(i).getSauceId());
+                    listSauces.addElement(sauces.get(i).getSauceName());
+                    jListSauce.setModel(listSauces);
+                }
+            }
+            System.out.println("side_dish: " + this.foodItem.getSideDishes().size());
+            List<SideDish> sideDishes = this.foodItem.getSideDishes();
+            sideDishIds = new ArrayList<>();
+            if (sideDishes.size() > 0) {
+                for (int i = 0; i < sideDishes.size(); i++) {
+                    sideDishIds.add(sideDishes.get(i).getSideDishId());
+                    listSideDishes.addElement(sideDishes.get(i).getSideDishName());
+                    jListSideDish.setModel(listSideDishes);
+                }
+            }
+            rServingIds = new ArrayList<>();
+            rSauceIds = new ArrayList<>();
+            rSideDishIds = new ArrayList<>();
         } else {
             System.out.println("null");
         }
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -58,8 +127,7 @@ public class FormFoodItem extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
         jTextFieldName = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
+        jTextFieldimage = new javax.swing.JTextField();
         jComboBoxCategory = new javax.swing.JComboBox();
         jLabel4 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -68,6 +136,27 @@ public class FormFoodItem extends javax.swing.JDialog {
         jButtonCancel = new javax.swing.JButton();
         jComboBoxCategoryId = new javax.swing.JComboBox();
         jTextFieldItemId = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jTextFieldServing = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        jTextFieldSauces = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        jTextFieldSideDish = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        jTextFieldPrice = new javax.swing.JTextField();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jListServing = new javax.swing.JList();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jListPrice = new javax.swing.JList();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jListSauce = new javax.swing.JList();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        jListSideDish = new javax.swing.JList();
+        jButtonRemoveServing = new javax.swing.JButton();
+        jButtonRemovePrice = new javax.swing.JButton();
+        jButtonRemoveSauce = new javax.swing.JButton();
+        jButtonRemoveSideDish = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -78,18 +167,14 @@ public class FormFoodItem extends javax.swing.JDialog {
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 60, 23));
 
         jTextFieldName.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jPanel1.add(jTextFieldName, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 380, 30));
+        jPanel1.add(jTextFieldName, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 500, 30));
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel2.setText("Category:");
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 60, 23));
 
-        jTextField2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jPanel1.add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 380, 30));
-
-        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jLabel3.setText("Image:");
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 150, 60, 23));
+        jTextFieldimage.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jPanel1.add(jTextFieldimage, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 460, 500, 30));
 
         jComboBoxCategory.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jComboBoxCategory.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select Category" }));
@@ -98,18 +183,18 @@ public class FormFoodItem extends javax.swing.JDialog {
                 jComboBoxCategoryItemStateChanged(evt);
             }
         });
-        jPanel1.add(jComboBoxCategory, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 380, 30));
+        jPanel1.add(jComboBoxCategory, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 500, 30));
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel4.setText("Description:");
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 220, 80, 23));
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 500, 80, 23));
 
         jTextAreaDescription.setColumns(20);
         jTextAreaDescription.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jTextAreaDescription.setRows(5);
         jScrollPane1.setViewportView(jTextAreaDescription);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 250, 380, 140));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 530, 500, 70));
 
         jButtonSave.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jButtonSave.setText("Save");
@@ -118,7 +203,7 @@ public class FormFoodItem extends javax.swing.JDialog {
                 jButtonSaveActionPerformed(evt);
             }
         });
-        jPanel1.add(jButtonSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 400, 80, 30));
+        jPanel1.add(jButtonSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 610, 80, 30));
 
         jButtonCancel.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jButtonCancel.setText("Cancel");
@@ -127,21 +212,131 @@ public class FormFoodItem extends javax.swing.JDialog {
                 jButtonCancelActionPerformed(evt);
             }
         });
-        jPanel1.add(jButtonCancel, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 400, 80, 30));
+        jPanel1.add(jButtonCancel, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 610, 80, 30));
 
         jComboBoxCategoryId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select Category Id" }));
         jPanel1.add(jComboBoxCategoryId, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 80, 320, -1));
         jPanel1.add(jTextFieldItemId, new org.netbeans.lib.awtextra.AbsoluteConstraints(259, 10, 130, -1));
 
+        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel5.setText("Image:");
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 430, 60, 23));
+
+        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel6.setText("Serving:");
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 150, 60, 23));
+
+        jTextFieldServing.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jTextFieldServing.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextFieldServingKeyPressed(evt);
+            }
+        });
+        jPanel1.add(jTextFieldServing, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 250, 30));
+
+        jLabel7.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel7.setText("Sauce:");
+        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 290, 60, 23));
+
+        jTextFieldSauces.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jTextFieldSauces.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextFieldSaucesKeyPressed(evt);
+            }
+        });
+        jPanel1.add(jTextFieldSauces, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 320, 250, 30));
+
+        jLabel8.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel8.setText("Side Dish:");
+        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 360, 90, 23));
+
+        jTextFieldSideDish.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jTextFieldSideDish.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextFieldSideDishKeyPressed(evt);
+            }
+        });
+        jPanel1.add(jTextFieldSideDish, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 390, 250, 30));
+
+        jLabel9.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel9.setText("Price:");
+        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 220, 60, 23));
+
+        jTextFieldPrice.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jTextFieldPrice.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextFieldPriceKeyPressed(evt);
+            }
+        });
+        jPanel1.add(jTextFieldPrice, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 250, 250, 30));
+
+        jListServing.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane2.setViewportView(jListServing);
+
+        jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 160, 190, 50));
+
+        jListPrice.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane3.setViewportView(jListPrice);
+
+        jPanel1.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 230, 190, 50));
+
+        jListSauce.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane4.setViewportView(jListSauce);
+
+        jPanel1.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 300, 190, 50));
+
+        jListSideDish.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane5.setViewportView(jListSideDish);
+
+        jPanel1.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 370, 190, 50));
+
+        jButtonRemoveServing.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jButtonRemoveServing.setText("-");
+        jButtonRemoveServing.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRemoveServingActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButtonRemoveServing, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 160, 40, 50));
+
+        jButtonRemovePrice.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jButtonRemovePrice.setText("-");
+        jButtonRemovePrice.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRemovePriceActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButtonRemovePrice, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 230, 40, 50));
+
+        jButtonRemoveSauce.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jButtonRemoveSauce.setText("-");
+        jButtonRemoveSauce.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRemoveSauceActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButtonRemoveSauce, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 300, 40, 50));
+
+        jButtonRemoveSideDish.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jButtonRemoveSideDish.setText("-");
+        jButtonRemoveSideDish.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRemoveSideDishActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButtonRemoveSideDish, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 370, 40, 50));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 522, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 444, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 645, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
@@ -152,27 +347,127 @@ public class FormFoodItem extends javax.swing.JDialog {
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
     private void jButtonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSaveActionPerformed
+        if(this.itemNames.contains(jTextFieldName.getText().toLowerCase())){
+            JOptionPane.showMessageDialog(this, "Item name already exist");
+            return;
+        }
         if (jTextFieldName.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Enter item name");
             jTextFieldName.requestFocus();
         } else if (jComboBoxCategory.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(this, "Select category");
             jComboBoxCategory.requestFocus();
+        } else if (listServings.getSize() == 0) {
+            JOptionPane.showMessageDialog(this, "Enter serving");
+            jTextFieldServing.requestFocus();
+        } else if (listPrices.getSize() == 1) {
+            JOptionPane.showMessageDialog(this, "Enter price");
+            jTextFieldPrice.requestFocus();
+        } else if (jTextFieldimage.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Select item image");
+            jTextFieldimage.requestFocus();
+        } else if (jTextAreaDescription.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Enter description");
+            jTextAreaDescription.requestFocus();
+        } else if (listServings.getSize() != listPrices.getSize()) {
+
+            JOptionPane.showMessageDialog(this, "Servings and Prices not equal.");
         } else {
             FoodItem localFoodItem = new FoodItem();
             Category category = new Category();
             FoodItemsDao foodItemsDao = new FoodItemsDao();
-            
-            
+            String price = "";
+            String subPrice = "";
+            String servingName = "";
+            String subServingName = "";
+            String sauceName = "";
+            String subSauceName = "";
+            String sideDishName = "";
+            String subSideDishName = "";
+            if (listServings.size() > 0) {
+                for (int i = 0; i < listServings.size(); i++) {
+                    price += listPrices.getElementAt(i) + ",";
+                    servingName += listServings.getElementAt(i) + ",";
+                }
+                subPrice = price.substring(0, price.length() - 1);
+                subServingName = servingName.substring(0, servingName.length() - 1);
+            }
+            if (listSauces.size() > 0) {
+                for (int i = 0; i < listSauces.size(); i++) {
+                    sauceName += listSauces.getElementAt(i) + ",";
+                }
+                subSauceName = sauceName.substring(0, sauceName.length() - 1);
+            }
+            if (listSideDishes.size() > 0) {
+                for (int i = 0; i < listSideDishes.size(); i++) {
+                    sideDishName += listSideDishes.getElementAt(i) + ",";
+                }
+                subSideDishName = sideDishName.substring(0, sideDishName.length() - 1);
+            }
+            System.out.println("action: " + this.formAction);
             if (this.formAction.equals("add") || this.formAction.equals("edit")) {
+                localFoodItem.setPrice(subPrice);
+                localFoodItem.setServingName(subServingName);
+                localFoodItem.setSauceName(subSauceName);
+                localFoodItem.setSideDishName(subSideDishName);
                 localFoodItem.setItemName(jTextFieldName.getText().trim());
                 localFoodItem.setDescription(jTextAreaDescription.getText().trim());
-                localFoodItem.setImage(jTextField2.getText().trim());
+                localFoodItem.setImage(jTextFieldimage.getText().trim());
                 category.setId(Integer.valueOf(jComboBoxCategoryId.getSelectedItem().toString()));
                 localFoodItem.setCategory(category);
-                if(this.formAction.equals("add")) {
+                if (this.formAction.equals("add")) {
                     foodItemsDao.add(localFoodItem);
                 } else {
+                    String servingId = "";
+                    String servId="";
+                    String sauceId="";
+                    String sId="";
+                    String sideDishId="";
+                    String sdId="";
+                    if(servingIds.size() > 0) {
+                        for(int i = 0; i < servingIds.size(); i++) {
+                            servingId += servingIds.get(i) + ",";
+                        }
+                        servId = servingId.substring(0, servingId.length() - 1);
+                    }
+                    if(sauceIds.size() > 0) {
+                        for(int i = 0; i < sauceIds.size(); i++) {
+                            sauceId += sauceIds.get(i) + ",";
+                        }
+                        sId = sauceId.substring(0, sauceId.length() - 1);
+                    }
+                    if(sideDishIds.size() > 0) {
+                        for(int i = 0; i < sideDishIds.size(); i++) {
+                            sideDishId += sideDishIds.get(i) + ",";
+                        }
+                        sdId = sideDishId.substring(0, sideDishId.length() - 1);
+                    }
+                    String rServId = "", rSauceId = "", rSideDishId = "";
+                    String _rServId = "", _rSauceId = "", _rSideDishId = "";
+                    if(rServingIds.size() > 0) {
+                        for(int i = 0; i < rServingIds.size(); i++) {
+                            rServId += rServingIds.get(i) + ",";
+                        }
+                        _rServId = rServId.substring(0, rServId.length() - 1);
+                    }
+                    if(rSauceIds.size() > 0) {
+                        for(int i = 0; i < rSauceIds.size(); i++) {
+                            rSauceId += rSauceIds.get(i) + ",";
+                        }
+                        _rSauceId = rSauceId.substring(0, rSauceId.length() - 1);
+                    }
+                    if(rSideDishIds.size() > 0) {
+                        for(int i = 0; i < rSideDishIds.size(); i++) {
+                            rSideDishId += rSideDishIds.get(i) + ",";
+                        }
+                        _rSideDishId = rSideDishId.substring(0, rSideDishId.length() - 1);
+                    }
+                    localFoodItem.setrServingId(_rServId);
+                    localFoodItem.setrSauceId(_rSauceId);
+                    localFoodItem.setrSideDishId(_rSideDishId);
+                    localFoodItem.setServingId(servId);
+                    localFoodItem.setSauceId(sId);
+                    localFoodItem.setSideDishId(sdId);
                     localFoodItem.setItemId(Integer.valueOf(jTextFieldItemId.getText()));
                     foodItemsDao.editDelete(localFoodItem, this.formAction);
                 }
@@ -184,39 +479,164 @@ public class FormFoodItem extends javax.swing.JDialog {
     private void jComboBoxCategoryItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxCategoryItemStateChanged
         jComboBoxCategoryId.setSelectedIndex(jComboBoxCategory.getSelectedIndex());
     }//GEN-LAST:event_jComboBoxCategoryItemStateChanged
-    
+
+    private void jTextFieldServingKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextFieldServingKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (!jTextFieldServing.getText().isEmpty()) {
+                if (!listServings.contains(jTextFieldServing.getText())) {
+                    listServings.addElement(jTextFieldServing.getText());
+                    jTextFieldServing.setText("");
+                    jListServing.setModel(listServings);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Serving exist!");
+                }
+            }
+        }
+    }//GEN-LAST:event_jTextFieldServingKeyPressed
+
+    private void jTextFieldSaucesKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextFieldSaucesKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (!jTextFieldSauces.getText().isEmpty()) {
+                if (!listSauces.contains(jTextFieldSauces.getText())) {
+                    listSauces.addElement(jTextFieldSauces.getText());
+                    jTextFieldSauces.setText("");
+                    jListSauce.setModel(listSauces);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Sauce exist!");
+                }
+            }
+        }
+    }//GEN-LAST:event_jTextFieldSaucesKeyPressed
+
+    private void jTextFieldSideDishKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextFieldSideDishKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (!jTextFieldSideDish.getText().isEmpty()) {
+                if (!listSideDishes.contains(jTextFieldSideDish.getText())) {
+                    listSideDishes.addElement(jTextFieldSideDish.getText());
+                    jTextFieldSideDish.setText("");
+                    jListSideDish.setModel(listSideDishes);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Side Dish exist!");
+                }
+            }
+        }
+    }//GEN-LAST:event_jTextFieldSideDishKeyPressed
+
+    private void jTextFieldPriceKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextFieldPriceKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (!jTextFieldPrice.getText().isEmpty()) {
+                listPrices.addElement(Double.valueOf(jTextFieldPrice.getText()));
+                jTextFieldPrice.setText("");
+                jListPrice.setModel(listPrices);
+            }
+        }
+    }//GEN-LAST:event_jTextFieldPriceKeyPressed
+
+    private void jButtonRemoveServingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveServingActionPerformed
+        System.out.println("serv pos: " + jListServing.getSelectedIndex() + " " + this.formAction);
+        int pos = jListServing.getSelectedIndex();
+        if (pos != -1) {
+            listServings.removeElementAt(pos);
+            if(this.formAction.equalsIgnoreCase("edit")) {
+                rServingIds.add(servingIds.get(pos));
+                servingIds.remove(pos);
+                listPrices.removeElementAt(pos);
+            }
+        }
+    }//GEN-LAST:event_jButtonRemoveServingActionPerformed
+
+    private void jButtonRemovePriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemovePriceActionPerformed
+        System.out.println("p pos: " + jListPrice.getSelectedIndex());
+        int pos = jListPrice.getSelectedIndex();
+        if (pos != -1) {
+            listPrices.removeElementAt(pos);
+        }
+        
+    }//GEN-LAST:event_jButtonRemovePriceActionPerformed
+
+    private void jButtonRemoveSauceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveSauceActionPerformed
+        System.out.println("s pos: " + jListSauce.getSelectedIndex() + " " + this.formAction);
+        int pos = jListSauce.getSelectedIndex();
+        if (pos != -1) {
+            listSauces.removeElementAt(pos);
+            if(this.formAction.equalsIgnoreCase("edit")) {
+                rSauceIds.add(sauceIds.get(pos));
+                sauceIds.remove(pos);
+            }
+        }
+    }//GEN-LAST:event_jButtonRemoveSauceActionPerformed
+
+    private void jButtonRemoveSideDishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveSideDishActionPerformed
+        System.out.println("sd pos: " + jListSideDish.getSelectedIndex() + " " + this.formAction);
+        int pos = jListSideDish.getSelectedIndex();
+        if (pos != -1) {
+            listSideDishes.removeElementAt(pos);
+            if(this.formAction.equalsIgnoreCase("edit")) {
+                rSideDishIds.add(sideDishIds.get(pos));
+                sideDishIds.remove(pos);
+            }
+        }
+    }//GEN-LAST:event_jButtonRemoveSideDishActionPerformed
+
     private void getCategory() {
         CategoryDao categoryDao = new CategoryDao();
-        for(Category category : categoryDao.getMenusData("")) {
+        for (Category category : categoryDao.getMenusData("")) {
             jComboBoxCategory.addItem(category.getName());
             jComboBoxCategoryId.addItem(category.getId());
         }
     }
-    
+
     private void clearData() {
         jTextAreaDescription.setText("");
-        jTextField2.setText("");
+        jTextFieldimage.setText("");
         jTextFieldName.setText("");
         jComboBoxCategory.setSelectedIndex(0);
+        listPrices.removeAllElements();
+        listSauces.removeAllElements();
+        listServings.removeAllElements();
+        listSideDishes.removeAllElements();
+        jListPrice.setModel(listPrices);
+        jListSauce.setModel(listSauces);
+        jListServing.setModel(listServings);
+        jListSideDish.setModel(listSideDishes);
     }
     /**
      * @param args the command line arguments
      */
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonCancel;
+    private javax.swing.JButton jButtonRemovePrice;
+    private javax.swing.JButton jButtonRemoveSauce;
+    private javax.swing.JButton jButtonRemoveServing;
+    private javax.swing.JButton jButtonRemoveSideDish;
     private javax.swing.JButton jButtonSave;
     private javax.swing.JComboBox jComboBoxCategory;
     private javax.swing.JComboBox jComboBoxCategoryId;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JList jListPrice;
+    private javax.swing.JList jListSauce;
+    private javax.swing.JList jListServing;
+    private javax.swing.JList jListSideDish;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTextArea jTextAreaDescription;
-    private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextFieldItemId;
     private javax.swing.JTextField jTextFieldName;
+    private javax.swing.JTextField jTextFieldPrice;
+    private javax.swing.JTextField jTextFieldSauces;
+    private javax.swing.JTextField jTextFieldServing;
+    private javax.swing.JTextField jTextFieldSideDish;
+    private javax.swing.JTextField jTextFieldimage;
     // End of variables declaration//GEN-END:variables
 }

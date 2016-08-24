@@ -70,7 +70,7 @@ public class Main extends javax.swing.JFrame {
         jToolBar2.setFloatable(false);
         jToolBar2.setRollover(true);
 
-        jButtonCategoryManagement.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/tgif/icons/Icon-Document.png"))); // NOI18N
+        jButtonCategoryManagement.setText("Food Menu");
         jButtonCategoryManagement.setToolTipText("Category Management");
         jButtonCategoryManagement.setFocusable(false);
         jButtonCategoryManagement.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -83,7 +83,7 @@ public class Main extends javax.swing.JFrame {
         jToolBar2.add(jButtonCategoryManagement);
         jToolBar2.add(jSeparator6);
 
-        jButtonFoodManagement.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/tgif/icons/Icon-Document.png"))); // NOI18N
+        jButtonFoodManagement.setText("Food Item");
         jButtonFoodManagement.setToolTipText("Food Item Management");
         jButtonFoodManagement.setFocusable(false);
         jButtonFoodManagement.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -96,8 +96,8 @@ public class Main extends javax.swing.JFrame {
         jToolBar2.add(jButtonFoodManagement);
         jToolBar2.add(jSeparator7);
 
-        jButtonUserManagement.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/tgif/icons/Icon-Document.png"))); // NOI18N
-        jButtonUserManagement.setToolTipText("Food Item Management");
+        jButtonUserManagement.setText("Users");
+        jButtonUserManagement.setToolTipText("Users");
         jButtonUserManagement.setFocusable(false);
         jButtonUserManagement.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonUserManagement.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -113,15 +113,15 @@ public class Main extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jMainDesktop)
-            .addComponent(jXStatusBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 470, Short.MAX_VALUE)
-            .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jXStatusBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 601, Short.MAX_VALUE)
+            .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(jMainDesktop, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
+                .addComponent(jMainDesktop, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jXStatusBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );

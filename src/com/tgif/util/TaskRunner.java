@@ -4,6 +4,7 @@
  */
 package com.tgif.util;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
@@ -13,19 +14,20 @@ import javax.swing.SwingWorker;
  * @author Mon
  */
 public class TaskRunner {
+
     private Task task;
     private int delay;
     private TaskManager taskManager;
     private boolean isRunning;
-    private class TaskManager extends SwingWorker<Void, Void> {
 
+    private class TaskManager extends SwingWorker<Void, Void> {
         @Override
         protected Void doInBackground() throws Exception {
             Task tmTask = getTask();
             int tmDelay = getDelay();
-            while(isRunning) {
-              tmTask.queTask();
-              Thread.sleep(tmDelay);
+            while (isRunning) {
+                tmTask.queTask();
+                Thread.sleep(tmDelay);
             }
             return null;
         }
@@ -46,9 +48,9 @@ public class TaskRunner {
     public void setDelay(int delay) {
         this.delay = delay;
     }
-    
+
     public void destroy() {
-        if(this.taskManager != null) {
+        if (this.taskManager != null) {
             this.taskManager.cancel(true);
             this.isRunning = false;
             this.taskManager = null;
@@ -58,13 +60,12 @@ public class TaskRunner {
             } catch (Exception ex) {
                 Logger.getLogger(TaskRunner.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } 
+        }
     }
-    
+
     public void run() {
-       this.isRunning = true;
-       this.taskManager = new TaskManager();
-       this.taskManager.execute();
+        this.isRunning = true;
+        this.taskManager = new TaskManager();
+        this.taskManager.execute();
     }
 }
-

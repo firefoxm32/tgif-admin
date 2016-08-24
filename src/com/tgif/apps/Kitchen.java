@@ -37,7 +37,7 @@ public class Kitchen extends javax.swing.JFrame {
     private void threading() {
         TaskRunner taskRunner = new TaskRunner();
         taskRunner.setTask(new Kitchen.TaskMenu());
-        taskRunner.setDelay(10000);
+        taskRunner.setDelay(3000);
         taskRunner.run();
     }
     

@@ -10,6 +10,8 @@ import com.tgif.model.Category;
 import com.tgif.util.TableManager;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
 import org.jdesktop.xswingx.PromptSupport;
 
@@ -181,8 +183,13 @@ public class FormCategoryManagement extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jButtonSearchActionPerformed
 
     private void jButtonNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNewActionPerformed
+        List<String> menuNames = new ArrayList<>();
+        for(int i = 0; i < jXTableSuppliers.getRowCount(); i++) {
+            menuNames.add(TableManager.getTableModel(jXTableSuppliers).getValueAt(i, 1).toString().toLowerCase());
+        }
         FormCategory form = new FormCategory(Main.JFParent, true);
         form.setTitle("Add Category");
+        form.setMenuNames(menuNames);
         form.setLocationRelativeTo(Main.JFParent);
         form.setVisible(true);
         jButtonSearch.doClick();
@@ -193,6 +200,10 @@ public class FormCategoryManagement extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jButtonExitActionPerformed
 
     private void jButtonEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEditActionPerformed
+        List<String> menuNames = new ArrayList<>();
+        for(int i = 0; i < jXTableSuppliers.getRowCount(); i++) {
+            menuNames.add(TableManager.getTableModel(jXTableSuppliers).getValueAt(i, 1).toString().toLowerCase());
+        }
         if (jXTableSuppliers.getSelectedRow() < 0) {
             JOptionPane.showMessageDialog(this, "Select record to edit");
             return;
@@ -208,6 +219,7 @@ public class FormCategoryManagement extends javax.swing.JInternalFrame {
         form.setTitle("Edit Category");
         form.setLocationRelativeTo(Main.JFParent);
         form.setCategory(category);
+        form.setMenuNames(menuNames);
         form.setData();
         form.setVisible(true);
         jButtonSearch.doClick();

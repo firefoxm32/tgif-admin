@@ -12,6 +12,8 @@ import com.tgif.model.User;
 import com.tgif.util.TableManager;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
 import org.jdesktop.xswingx.PromptSupport;
 
@@ -21,7 +23,7 @@ import org.jdesktop.xswingx.PromptSupport;
  */
 public class FormUserManagement extends javax.swing.JInternalFrame {
 
-    private String[] header = {"Username",  "Table Number", "User Type"};
+    private String[] header = {"Username", "Table Number", "User Type"};
     private boolean[] cellEditable = {false, false, false};
     private int[] width = {250, 90, 90};
 
@@ -49,17 +51,17 @@ public class FormUserManagement extends javax.swing.JInternalFrame {
     }
 
     private void getUser() {
-       TableManager.getTableModel(jXTableUser).setRowCount(0);
+        TableManager.getTableModel(jXTableUser).setRowCount(0);
         UserDao userDao = new UserDao();
-       for(User user : userDao.getUserData()) {
-           jComboBoxPassword.addItem(String.valueOf(user.getPassword()));
-           String type = user.getUserType().equalsIgnoreCase("m") ? "Mobile" : "Admin";
-           TableManager.getTableModel(jXTableUser).addRow(new Object[]{
-               user.getUsername(),
-               user.getTableNumber(),
-               type
-           });
-       }
+        for (User user : userDao.getUserData()) {
+            jComboBoxPassword.addItem(String.valueOf(user.getPassword()));
+            String type = user.getUserType().equalsIgnoreCase("m") ? "Mobile" : "Admin";
+            TableManager.getTableModel(jXTableUser).addRow(new Object[]{
+                user.getUsername(),
+                user.getTableNumber(),
+                type
+            });
+        }
     }
 
     /**
@@ -189,9 +191,16 @@ public class FormUserManagement extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jButtonSearchActionPerformed
 
     private void jButtonNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNewActionPerformed
+        List<Integer> tnum = new ArrayList<>();
+        for (int i = 0; i < TableManager.getTableModel(jXTableUser).getRowCount(); i++) {
+            if (Integer.valueOf(TableManager.getTableModel(jXTableUser).getValueAt(i, 1).toString()) > 0) {
+                tnum.add(Integer.valueOf(TableManager.getTableModel(jXTableUser).getValueAt(i, 1).toString()));
+            }
+        }
         FormUser form = new FormUser(Main.JFParent, true);
         form.setTitle("Add User");
         form.setLocationRelativeTo(Main.JFParent);
+        form.setTableNumber(tnum);
         form.setAction("add");
         form.setVisible(true);
         jButtonSearch.doClick();
@@ -206,7 +215,7 @@ public class FormUserManagement extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(this, "Select record to edit");
             return;
         }
-        
+
         User user = new User();
         String userName = TableManager.getTableModel(jXTableUser).getValueAt(jXTableUser.getSelectedRow(), 0).toString();
         user.setUsername(userName);
@@ -217,7 +226,7 @@ public class FormUserManagement extends javax.swing.JInternalFrame {
         jComboBoxPassword.setSelectedIndex(jXTableUser.getSelectedRow());
         String password = String.valueOf(jComboBoxPassword.getSelectedItem());
         user.setPassword(password);
-        
+
         FormUser form = new FormUser(Main.JFParent, true);
         form.setTitle("Edit User");
         form.setLocationRelativeTo(Main.JFParent);
@@ -243,7 +252,6 @@ public class FormUserManagement extends javax.swing.JInternalFrame {
         categoryDao.save(category, "delete");
         jButtonSearch.doClick();
     }//GEN-LAST:event_jButtonDeleteActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonDelete;
     private javax.swing.JButton jButtonEdit;

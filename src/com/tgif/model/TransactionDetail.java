@@ -22,9 +22,36 @@ public class TransactionDetail {
     private Serving serving;
     private List<Sauce> sauce;
     private SideDish sideDish;
+    private Double credit;
+    private Double debit;
+    private Double cash;
+
+    public Double getCash() {
+        return cash;
+    }
+
+    public void setCash(Double cash) {
+        this.cash = cash;
+    }
 
     public String getTransactionId() {
         return transactionId;
+    }
+
+    public Double getCredit() {
+        return credit;
+    }
+
+    public void setCredit(Double credit) {
+        this.credit = credit;
+    }
+
+    public Double getDebit() {
+        return debit;
+    }
+
+    public void setDebit(Double debit) {
+        this.debit = debit;
     }
 
     public void setTransactionId(String transactionId) {

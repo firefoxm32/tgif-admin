@@ -25,6 +25,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -36,8 +37,10 @@ public class Cashier extends javax.swing.JFrame {
     private JLabel[] jLabeltableNum;
     private JPanel[] jPaneltables;
     private JLabel[] jLabelstatus;
+    private JLabel[] jLabelWaiting;
     private int i;
     private int x;
+    private TaskRunner taskRunner = new TaskRunner();
 
     /**
      * Creates new form Kitchen
@@ -50,9 +53,8 @@ public class Cashier extends javax.swing.JFrame {
     }
 
     private void threading() {
-        TaskRunner taskRunner = new TaskRunner();
         taskRunner.setTask(new Cashier.CashierTask());
-        taskRunner.setDelay(10000);
+        taskRunner.setDelay(2000);
         taskRunner.run();
     }
 
@@ -60,8 +62,6 @@ public class Cashier extends javax.swing.JFrame {
         CashierDao cashierDao = new CashierDao();
         List<Table> tablesList = cashierDao.getTableStatus();
 
-//        jLabeltableNum = new JLabel[tablesList.size()];
-//        jLabelstatus = new JLabel[tablesList.size()];
         return tablesList;
     }
 
@@ -108,14 +108,13 @@ public class Cashier extends javax.swing.JFrame {
 
     private void gridLayout() {
         int tableCount = a().size();
-
         jPaneltables = new JPanel[tableCount];
         GridLayout gLayout = new GridLayout();
         gLayout.setHgap(5);
         gLayout.setVgap(5);
 
         if (tableCount == 1) {
-            gLayout.setRows(0);
+            gLayout.setRows(1);
             gLayout.setColumns(1);
         } else if (tableCount
                 < 11) {
@@ -123,25 +122,17 @@ public class Cashier extends javax.swing.JFrame {
                 gLayout.setRows(2);
                 gLayout.setColumns(3);
             } else if ((tableCount % 1) == 0) {
-                gLayout = new GridLayout(3, 3);
-                gLayout.setHgap(5);
-                gLayout.setVgap(5);
-                jPanel1.setLayout(gLayout);
+                gLayout.setRows(3);
+                gLayout.setColumns(3);
             }
         } else if (tableCount
                 > 10) {
             if ((tableCount % 2) == 0) {
-                gLayout = new GridLayout(4, 4);
-                gLayout.setHgap(5);
-                gLayout.setVgap(5);
-                jPanel1.setLayout(gLayout);
-
+                gLayout.setRows(4);
+                gLayout.setColumns(4);
             } else if ((tableCount % 1) == 0) {
-                gLayout = new GridLayout(5, 5);
-                gLayout.setHgap(5);
-                gLayout.setVgap(5);
-                jPanel1.setLayout(gLayout);
-
+                gLayout.setRows(5);
+                gLayout.setColumns(5);
             }
         } else {
             System.out.println("error");
@@ -173,11 +164,8 @@ public class Cashier extends javax.swing.JFrame {
                 public void mouseClicked(MouseEvent me) {
                     super.mouseClicked(me); //To change body of generated methods, choose Tools | Templates.
 //                    JOptionPane.showMessageDialog(null, tables[myIndex].getName());
-                    System.out.println("index: " + myIndex);
-//                    System.out.println("tableNum_size: " + tableNumberList.size());
-                    System.out.println("tableNum: " + a().get(myIndex).getTableNumber());
                     if (jLabelstatus[myIndex].getText().equalsIgnoreCase("Waiting") || jLabelstatus[myIndex].getText().equalsIgnoreCase("Occupied")) {
-                        JOptionPane.showMessageDialog(null, "Not Occupied");
+                        JOptionPane.showMessageDialog(null, "Not Check Out");
                     } else {
                         callForm(a().get(myIndex).getTableNumber());
                     }
@@ -195,45 +183,94 @@ public class Cashier extends javax.swing.JFrame {
             setTableBackground(a());
         }
     }
+    private List<String> listStatus;
+    private List<Integer> listTableNumber;
 
     private void setTableBackground(List<Table> status) {
-        System.out.println("here");
-        System.out.println("size: " + status.size());
         jLabeltableNum = new JLabel[status.size()];
         jLabelstatus = new JLabel[status.size()];
+        jLabelWaiting = new JLabel[status.size()];
+        listStatus = new ArrayList<>();
+        listTableNumber = new ArrayList<>();
         for (x = 0; x < status.size(); x++) {
+
             jLabelstatus[x] = new JLabel();
+            jLabelWaiting[x] = new JLabel();
+            listStatus.add(status.get(x).getStatus());
+            listTableNumber.add(status.get(x).getTableNumber());
 
-            if (status.get(x).getStatus().equalsIgnoreCase("O")) {
-                jPaneltables[x].setBackground(Color.green);
-                jLabelstatus[x].setText("Occupied");
-            } else if (status.get(x).getStatus().equalsIgnoreCase("C")) {
-                jPaneltables[x].setBackground(Color.red);
-                jLabelstatus[x].setText("Check Out");
-            } else {
-                jPaneltables[x].setBackground(Color.gray);
-                jLabelstatus[x].setText("Waiting");
-            }
+            SwingUtilities.invokeLater(new Runnable() {
+                private int _x;
 
-            jLabeltableNum[x] = new JLabel();
-            jLabeltableNum[x].setFont(new Font("Tahoma", Font.PLAIN, 24));
-            jLabeltableNum[x].setText("#" + status.get(x).getTableNumber());
-            jLabeltableNum[x].setAlignmentX(Component.CENTER_ALIGNMENT);
+                {
+                    this._x = x;
+                }
 
+                @Override
+                public void run() {
+                    if (listStatus.get(_x).equalsIgnoreCase("W")) {
+                        jLabelstatus[_x].setText("Waiting");
+                        System.out.println("x: " + _x);
+                    }
+//                    jPaneltables[_x].remove(jLabelstatus[_x]);
+                    jPaneltables[_x].removeAll();
+                    if (listStatus.get(_x).equalsIgnoreCase("O")) {
+                        jPaneltables[_x].setBackground(Color.green);
+                        jlabelSettext(listStatus.get(_x), _x);
+                    } else if (listStatus.get(_x).equalsIgnoreCase("C")) {
+                        jPaneltables[_x].setBackground(Color.red);
+                        jlabelSettext(listStatus.get(_x), _x);
+                    } else if (listStatus.get(_x).equalsIgnoreCase("W")) {
+                        jPaneltables[_x].setBackground(Color.gray);
+                        jlabelSettext(listStatus.get(_x), _x);
+                    }
+                    
+                    jLabeltableNum[_x] = new JLabel();
+                    jLabeltableNum[_x].setFont(new Font("Tahoma", Font.PLAIN, 24));
+                    jLabeltableNum[_x].setText("#" + listTableNumber.get(_x));
+                    jLabeltableNum[_x].setAlignmentX(Component.CENTER_ALIGNMENT);
+                    jLabeltableNum[_x].revalidate();
+                    
+                    jLabelstatus[_x].setFont(new Font("Tahoma", Font.PLAIN, 24));
+                    jLabelstatus[_x].setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            jLabelstatus[x].setFont(new Font("Tahoma", Font.PLAIN, 24));
-
-            jLabelstatus[x].setAlignmentX(Component.CENTER_ALIGNMENT);
-            jPaneltables[x].add(jLabeltableNum[x]);
-            jPaneltables[x].add(Box.createRigidArea(new Dimension(0, 30)));
-            jPaneltables[x].add(jLabelstatus[x]);
+                    jPaneltables[_x].add(jLabeltableNum[_x]);
+                    jPaneltables[_x].add(Box.createRigidArea(new Dimension(0, 30)));
+                    jPaneltables[_x].add(jLabelstatus[_x]);
+                }
+            });
         }
+    }
+    private int y;
+    private String strStatus;
+
+    private void jlabelSettext(String status, int yy) {
+        this.y = yy;
+        if (status.equalsIgnoreCase("O")) {
+            strStatus = "Occupied";
+        } else if (status.equalsIgnoreCase("C")) {
+            strStatus = "Check Out";
+        } else if (status.equalsIgnoreCase("W")) {
+            System.out.println(status);
+            strStatus = "Waiting";
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+//                jLabelstatus[y].revalidate();
+                
+                jLabelstatus[y].setText(strStatus);
+                jLabelstatus[y].revalidate();
+            }
+        });
     }
 
     private void callForm(int tableNumber) {
+        taskRunner.destroy();
         FormTransactionDetail form = new FormTransactionDetail(this, true, tableNumber);
         form.setLocationRelativeTo(null);
         form.setVisible(true);
+        taskRunner.run();
     }
 
     /**

@@ -6,8 +6,10 @@ package com.tgif.view;
 
 import com.tgif.dao.CashierDao;
 import com.tgif.model.TransactionDetail;
+import com.tgif.model.TransactionHeader;
 import com.tgif.util.TableManager;
 import java.awt.Font;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -15,11 +17,10 @@ import java.awt.Font;
  */
 public class FormTransactionDetail extends javax.swing.JDialog {
 //    private String transactionId;
-   
-    
+
     private String[] header = {"Detail", "price", "quantity"};
     private boolean[] cellEditable = {false, false, false};
-    private int[] width = {633,100,100};
+    private int[] width = {633, 100, 100};
 
     /**
      * Creates new form FormTransactionDetail
@@ -40,24 +41,30 @@ public class FormTransactionDetail extends javax.swing.JDialog {
     }
 
     private void getTransactionDetails() {
-        Double price=0.0;
+        Double credit = 0.0;
+        Double cash = 0.0;
         CashierDao cashierDao = new CashierDao();
         TableManager.getTableModel(jTableTransactionDetails).setRowCount(0);
         for (TransactionDetail detail : cashierDao.getTransactionDetails(Integer.valueOf(jLabelTableNumber.getText()))) {
+            jTextFieldTransactionId.setText(detail.getTransactionId());
             String sauce = "";
-            price = price + detail.getPrice();
+            credit = detail.getCredit();
+            cash = detail.getCash();
             for (int i = 0; i < detail.getSauce().size(); i++) {
-                sauce = detail.getSauce().get(i).getAbbreviation()+ ", ";
+                sauce = detail.getSauce().get(i).getAbbreviation() + ", ";
             }
-            String details = detail.getFoodItem().getItemName() + ", Serving: (" + detail.getServing().getAbbreviation() + ", "
-                    + ")Sauce/s: (" + sauce.substring(0, sauce.length() - 2) + "), Side Dish: (" + detail.getSideDish().getAbbreviation() + ")";
+            String details = detail.getFoodItem().getItemName() + ", Serving: (" + detail.getServing().getAbbreviation() + "), "
+                    + "Sauce/s: (" + sauce.substring(0, sauce.length() - 2) + "), Side Dish: (" + detail.getSideDish().getAbbreviation() + ")";
             TableManager.getTableModel(jTableTransactionDetails).addRow(new Object[]{
                 details,
                 detail.getPrice(),
                 detail.getQuantity()
             });
         }
-        jLabelTotal.setText(String.valueOf(price));
+        jLabelCash.setText(String.valueOf(cash));
+        jLabelTotal.setText(String.valueOf(credit));
+        Double change = cash - credit;
+        jLabelChange.setText(String.valueOf(change));
     }
 
     /**
@@ -82,6 +89,7 @@ public class FormTransactionDetail extends javax.swing.JDialog {
         jButtonClose = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         jLabelTableNumber = new javax.swing.JLabel();
+        jTextFieldTransactionId = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -149,6 +157,7 @@ public class FormTransactionDetail extends javax.swing.JDialog {
         jLabelTableNumber.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabelTableNumber.setText("0");
         jPanel1.add(jLabelTableNumber, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, -1, -1));
+        jPanel1.add(jTextFieldTransactionId, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 370, 140, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -171,7 +180,24 @@ public class FormTransactionDetail extends javax.swing.JDialog {
     }//GEN-LAST:event_jButtonCloseActionPerformed
 
     private void jButtonCheckOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCheckOutActionPerformed
-        
+        CashierDao cashierDao = new CashierDao();
+        int result = JOptionPane.showConfirmDialog(this, "Chec Out", "Check Out", JOptionPane.YES_NO_OPTION);
+        if (result == JOptionPane.NO_OPTION) {
+            JOptionPane.showMessageDialog(this, "Cancel");
+            return;
+        }
+        TransactionHeader transactionHeader = new TransactionHeader();
+        transactionHeader.setTransactionId(jTextFieldTransactionId.getText());
+        transactionHeader.setCashAmount(Double.valueOf(jLabelCash.getText()));
+        transactionHeader.setTableNumber(Integer.valueOf(jLabelTableNumber.getText()));
+        transactionHeader.setCashierId("cashier1"); // username = id
+        if (!transactionHeader.getTransactionId().equalsIgnoreCase("")) {
+            cashierDao.save(transactionHeader);
+            this.dispose();
+        } else {
+            System.out.println("transaction_header: "+transactionHeader);
+            System.out.println("null");
+        }
     }//GEN-LAST:event_jButtonCheckOutActionPerformed
     /**
      * @param args the command line arguments
@@ -190,5 +216,6 @@ public class FormTransactionDetail extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTableTransactionDetails;
+    private javax.swing.JTextField jTextFieldTransactionId;
     // End of variables declaration//GEN-END:variables
 }

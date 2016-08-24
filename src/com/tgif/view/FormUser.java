@@ -6,6 +6,7 @@ package com.tgif.view;
 
 import com.tgif.dao.UserDao;
 import com.tgif.model.User;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 /**
@@ -16,6 +17,11 @@ public class FormUser extends javax.swing.JDialog {
 
     private User user;
     private String action;
+    private List<Integer> tableNumber;
+
+    public void setTableNumber(List<Integer> tableNumber) {
+        this.tableNumber = tableNumber;
+    }
 
     public void setAction(String action) {
         this.action = action;
@@ -47,6 +53,7 @@ public class FormUser extends javax.swing.JDialog {
     public FormUser(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+
     }
 
     /**
@@ -82,6 +89,11 @@ public class FormUser extends javax.swing.JDialog {
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 90, 30));
 
         jTextFieldUsername.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jTextFieldUsername.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jTextFieldUsernameFocusGained(evt);
+            }
+        });
         jPanel1.add(jTextFieldUsername, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 10, 270, 30));
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
@@ -102,11 +114,21 @@ public class FormUser extends javax.swing.JDialog {
         buttonGroup1.add(jRadioButtonMobile);
         jRadioButtonMobile.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jRadioButtonMobile.setText("Mobile");
+        jRadioButtonMobile.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jRadioButtonMobileItemStateChanged(evt);
+            }
+        });
         jPanel1.add(jRadioButtonMobile, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 130, -1, 30));
 
         buttonGroup1.add(jRadioButtonAdmin);
         jRadioButtonAdmin.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jRadioButtonAdmin.setText("Admin");
+        jRadioButtonAdmin.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jRadioButtonAdminItemStateChanged(evt);
+            }
+        });
         jPanel1.add(jRadioButtonAdmin, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 130, -1, 30));
 
         jButton1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
@@ -130,6 +152,11 @@ public class FormUser extends javax.swing.JDialog {
 
         jComboBoxTableNumber.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jComboBoxTableNumber.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select Number", "1", "2", "3", "4", "5", "6" }));
+        jComboBoxTableNumber.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jComboBoxTableNumberItemStateChanged(evt);
+            }
+        });
         jPanel1.add(jComboBoxTableNumber, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 90, 270, 30));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -154,9 +181,40 @@ public class FormUser extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void jRadioButtonAdminItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioButtonAdminItemStateChanged
+        jComboBoxTableNumber.setEnabled(false);
+        jComboBoxTableNumber.setSelectedIndex(0);
+        jTextFieldUsername.setText("");
+        jTextFieldUsername.requestFocus();
+    }//GEN-LAST:event_jRadioButtonAdminItemStateChanged
+
+    private void jRadioButtonMobileItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioButtonMobileItemStateChanged
+        jComboBoxTableNumber.setEnabled(true);
+        int x = tableNumber.get(tableNumber.size() - 1);
+//        System.out.println("x: " + (x + 1));
+        x++;
+        jComboBoxTableNumber.setSelectedItem(String.valueOf(x));
+    }//GEN-LAST:event_jRadioButtonMobileItemStateChanged
+
+    private void jComboBoxTableNumberItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxTableNumberItemStateChanged
+    }//GEN-LAST:event_jComboBoxTableNumberItemStateChanged
+
+    private void jTextFieldUsernameFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldUsernameFocusGained
+        if (!jRadioButtonAdmin.isSelected()) {
+            int x = tableNumber.get(tableNumber.size() - 1);
+//        System.out.println("x: " + (x + 1));
+            x++;
+            jComboBoxTableNumber.setSelectedItem(String.valueOf(x));
+            jTextFieldUsername.setText("table" + x);
+            for (int i = 0; i < tableNumber.size(); i++) {
+                int items = Integer.valueOf(jComboBoxTableNumber.getItemAt((jComboBoxTableNumber.getItemCount() - 1)).toString()) + 1;
+                jComboBoxTableNumber.addItem(items);
+            }
+        }
+    }//GEN-LAST:event_jTextFieldUsernameFocusGained
+
     private void saveUser() {
-        System.out.println("action: "+this.action);
-        System.out.println("pass: " + String.valueOf(jPasswordFieldPassword.getPassword()));
+
         if (jTextFieldUsername.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Input username");
             jTextFieldUsername.requestFocus();
@@ -172,6 +230,14 @@ public class FormUser extends javax.swing.JDialog {
             jComboBoxTableNumber.requestFocus();
             return;
         }
+
+        for (int i = 0; i < tableNumber.size(); i++) {
+            if (tableNumber.get(i) == Integer.valueOf(jComboBoxTableNumber.getSelectedItem().toString())) {
+                JOptionPane.showMessageDialog(this, "Table number already used");
+                return;
+            }
+        }
+
         if (jRadioButtonMobile.isSelected() == false && jRadioButtonAdmin.isSelected() == false) {
             JOptionPane.showMessageDialog(this, "Select user type");
             return;
@@ -186,7 +252,7 @@ public class FormUser extends javax.swing.JDialog {
         userDao.save(localUser, this.action);
         clearData();
     }
-    
+
     private void clearData() {
         jTextFieldUsername.setText("");
         jComboBoxTableNumber.setSelectedIndex(0);

@@ -5,13 +5,14 @@
 package com.tgif.view;
 
 import com.tgif.apps.Main;
-import com.tgif.dao.CategoryDao;
 import com.tgif.dao.FoodItemsDao;
 import com.tgif.model.Category;
 import com.tgif.model.FoodItem;
 import com.tgif.util.TableManager;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
 import org.jdesktop.xswingx.PromptSupport;
 
@@ -21,10 +22,11 @@ import org.jdesktop.xswingx.PromptSupport;
  */
 public class FormFoodItemManagement extends javax.swing.JInternalFrame {
 
-    private String[] header = {"Item Id", "Category Name", "Item Name", "Image", "Order Count", "Description"};
-    private boolean[] cellEditable = {false, false, false,false,false,false};
-    private int[] width = {100, 150, 150, 150, 100, 500};
-    private String[] fields = {"","item_id", "label", "menu_name", "image"};
+    private String[] header = {"Item Id", "Category Name", "Item Name", "Image", "Description", "Promo Price", "Promo Status"};
+    private boolean[] cellEditable = {false, false, false, false, false, false, false};
+    private int[] width = {100, 150, 150, 150, 500, 100, 100};
+    private String[] fields = {"", "item_id", "label", "menu_name", "image"};
+
     /**
      * Creates new form FormSupplierManagement
      */
@@ -43,10 +45,10 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
 
     private void initTable() {
         TableManager.setModel(jXTableSuppliers, jScrollPaneSuppliers, null, header, false, false, 0, cellEditable, width);
-        getfooItem("","");
+        getfoodItem("", "");
     }
 
-    private void getfooItem(String field, String value) {
+    private void getfoodItem(String field, String value) {
         TableManager.getTableModel(jXTableSuppliers).setRowCount(0);
         FoodItemsDao foodItemsDao = new FoodItemsDao();
         for (FoodItem foodItem : foodItemsDao.getFoodItems(field, value)) {
@@ -55,8 +57,9 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
                 foodItem.getCategory().getName(),
                 foodItem.getItemName(),
                 foodItem.getImage(),
-                null,
-                foodItem.getDescription()
+                foodItem.getDescription(),
+                foodItem.getPromoPrice(),
+                foodItem.getPromoStatus()
             });
         }
     }
@@ -76,6 +79,7 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
         jButtonNew = new javax.swing.JButton();
         jButtonEdit = new javax.swing.JButton();
         jButtonDelete = new javax.swing.JButton();
+        jButtonPromo = new javax.swing.JButton();
         jScrollPaneSuppliers = new javax.swing.JScrollPane();
         jXTableSuppliers = new org.jdesktop.swingx.JXTable();
         jTextFieldSearch = new javax.swing.JTextField();
@@ -97,7 +101,7 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
                 jButtonExitActionPerformed(evt);
             }
         });
-        jPanel2.add(jButtonExit, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 0, 90, -1));
+        jPanel2.add(jButtonExit, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 0, 90, -1));
 
         jButtonNew.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jButtonNew.setText("New");
@@ -106,7 +110,7 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
                 jButtonNewActionPerformed(evt);
             }
         });
-        jPanel2.add(jButtonNew, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 0, 90, -1));
+        jPanel2.add(jButtonNew, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 0, 90, -1));
 
         jButtonEdit.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jButtonEdit.setText("Edit");
@@ -115,7 +119,7 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
                 jButtonEditActionPerformed(evt);
             }
         });
-        jPanel2.add(jButtonEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 0, 90, -1));
+        jPanel2.add(jButtonEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 0, 90, -1));
 
         jButtonDelete.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jButtonDelete.setText("Delete");
@@ -124,9 +128,18 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
                 jButtonDeleteActionPerformed(evt);
             }
         });
-        jPanel2.add(jButtonDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 0, 90, -1));
+        jPanel2.add(jButtonDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 0, 90, -1));
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 370, 450, -1));
+        jButtonPromo.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jButtonPromo.setText("Promo");
+        jButtonPromo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonPromoActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButtonPromo, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 0, 90, -1));
+
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 370, 510, -1));
 
         jScrollPaneSuppliers.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
@@ -193,7 +206,7 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
 
     private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchActionPerformed
         if (jComboBoxField.getSelectedIndex() > 0) {
-            getfooItem(fields[jComboBoxField.getSelectedIndex()], jTextFieldSearch.getText());
+            getfoodItem(fields[jComboBoxField.getSelectedIndex()], jTextFieldSearch.getText());
         } else {
             JOptionPane.showMessageDialog(this, "Please select field");
             jComboBoxField.requestFocus();
@@ -201,12 +214,18 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jButtonSearchActionPerformed
 
     private void jButtonNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNewActionPerformed
+        List<String> itemNames = new ArrayList<>();
+        for(int i = 0; i < jXTableSuppliers.getRowCount(); i++) {
+            itemNames.add(jXTableSuppliers.getValueAt(i, 2).toString().toLowerCase());
+        }
         FormFoodItem form = new FormFoodItem(Main.JFParent, true);
         form.setTitle("Add Food Item");
+        form.setItemNames(itemNames);
         form.setLocationRelativeTo(Main.JFParent);
         form.setVisible(true);
 //        jButtonSearch.doClick();
-        getfooItem("", "");
+
+        getfoodItem("", "");
     }//GEN-LAST:event_jButtonNewActionPerformed
 
     private void jButtonExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonExitActionPerformed
@@ -214,47 +233,53 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jButtonExitActionPerformed
 
     private void jButtonEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEditActionPerformed
-        if (jXTableSuppliers.getSelectedRow() < 0) {
-            JOptionPane.showMessageDialog(this, "Select record to edit");
-            return;
+        List<String> itemNames = new ArrayList<>();
+        for(int i = 0; i < jXTableSuppliers.getRowCount(); i++) {
+            itemNames.add(jXTableSuppliers.getValueAt(i, 2).toString().toLowerCase());
         }
-        int itemId = Integer.valueOf(jXTableSuppliers.getValueAt(jXTableSuppliers.getSelectedRow(), 0).toString());
-        String categoryName = jXTableSuppliers.getValueAt(jXTableSuppliers.getSelectedRow(), 1).toString();
-        String itemName = jXTableSuppliers.getValueAt(jXTableSuppliers.getSelectedRow(), 2).toString();
-        String image = jXTableSuppliers.getValueAt(jXTableSuppliers.getSelectedRow(), 3).toString();
-        String description = jXTableSuppliers.getValueAt(jXTableSuppliers.getSelectedRow(), 5).toString();
-        
-        FoodItem foodItem = new FoodItem();
-        
-        Category category = new Category();
-        category.setName(categoryName);
-        foodItem.setItemId(itemId);
-        foodItem.setItemName(itemName);
-        foodItem.setImage(image);
-        foodItem.setDescription(description);
-        foodItem.setCategory(category);
-        
-        FormFoodItem form = new FormFoodItem(Main.JFParent, true);
-        form.setTitle("Edit Food Item");
-        form.setLocationRelativeTo(Main.JFParent);
-        form.setFoodItem(foodItem);
-        form.setData();
-        form.setVisible(true);
-        form.dispose();
-        getfooItem("", "");
+        if (jXTableSuppliers.getSelectedRow() >= 0) {
+            int itemId = Integer.valueOf(jXTableSuppliers.getValueAt(jXTableSuppliers.getSelectedRow(), 0).toString());
+            String categoryName = jXTableSuppliers.getValueAt(jXTableSuppliers.getSelectedRow(), 1).toString();
+            String itemName = jXTableSuppliers.getValueAt(jXTableSuppliers.getSelectedRow(), 2).toString();
+            String image = jXTableSuppliers.getValueAt(jXTableSuppliers.getSelectedRow(), 3).toString();
+            String description = jXTableSuppliers.getValueAt(jXTableSuppliers.getSelectedRow(), 4).toString();
+
+            FoodItem foodItem = new FoodItem();
+            Category category = new Category();
+            category.setName(categoryName);
+            foodItem.setItemId(itemId);
+            foodItem.setItemName(itemName);
+            foodItem.setImage(image);
+            foodItem.setDescription(description);
+            foodItem.setCategory(category);
+
+
+            FormFoodItem form = new FormFoodItem(Main.JFParent, true);
+            form.setTitle("Edit Food Item");
+            form.setItemNames(itemNames);
+            form.setLocationRelativeTo(Main.JFParent);
+            form.setFoodItem(foodItem);
+            form.setData();
+            form.setVisible(true);
+            form.dispose();
+            getfoodItem("", "");
+        } else {
+            JOptionPane.showMessageDialog(this, "Select record to edit");
+        }
     }//GEN-LAST:event_jButtonEditActionPerformed
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
-        if (jXTableSuppliers.getSelectedRow() < 0) {
+        if (jXTableSuppliers.getSelectedRow() >= 0) {
+            int id = Integer.valueOf(TableManager.getTableModel(jXTableSuppliers).getValueAt(jXTableSuppliers.getSelectedRow(), 0).toString());
+            FoodItem foodItem = new FoodItem();
+            foodItem.setItemId(id);
+            FoodItemsDao foodItemsDao = new FoodItemsDao();
+            foodItemsDao.editDelete(foodItem, "delete");
+            getfoodItem("", "");
+        } else {
             JOptionPane.showMessageDialog(this, "Select record to edit");
-            return;
         }
-        int id = Integer.valueOf(TableManager.getTableModel(jXTableSuppliers).getValueAt(jXTableSuppliers.getSelectedRow(), 0).toString());
-        FoodItem foodItem = new FoodItem();
-        foodItem.setItemId(id);
-        FoodItemsDao foodItemsDao = new FoodItemsDao();
-        foodItemsDao.editDelete(foodItem,"");
-        getfooItem("", "");
+
     }//GEN-LAST:event_jButtonDeleteActionPerformed
 
     private void jComboBoxFieldItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxFieldItemStateChanged
@@ -263,11 +288,37 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_jComboBoxFieldItemStateChanged
 
+    private void jButtonPromoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPromoActionPerformed
+        System.out.println(jXTableSuppliers.getSelectedRow());
+        if (jXTableSuppliers.getSelectedRow() >= 0) {
+            int id = Integer.valueOf(TableManager.getTableModel(jXTableSuppliers).getValueAt(jXTableSuppliers.getSelectedRow(), 0).toString());
+            String itemName = TableManager.getTableModel(jXTableSuppliers).getValueAt(jXTableSuppliers.getSelectedRow(), 2).toString();
+            String promoStatus = TableManager.getTableModel(jXTableSuppliers).getValueAt(jXTableSuppliers.getSelectedRow(), 6).toString();
+            Double promoPrice = Double.valueOf(TableManager.getTableModel(jXTableSuppliers).getValueAt(jXTableSuppliers.getSelectedRow(), 5).toString());
+
+            FoodItem foodItem = new FoodItem();
+            foodItem.setItemId(id);
+            foodItem.setItemName(itemName);
+            foodItem.setPromoPrice(promoPrice);
+            foodItem.setPromoStatus(promoStatus);
+            FormPromo formPromo = new FormPromo(Main.JFParent, true);
+            formPromo.setTitle("Add/Edit Promo");
+            formPromo.setLocationRelativeTo(Main.JFParent);
+            formPromo.setFoodItem(foodItem);
+            formPromo.setData();
+            formPromo.setVisible(true);
+            formPromo.dispose();
+            getfoodItem("", "");
+        } else {
+            JOptionPane.showMessageDialog(this, "Select record to edit");
+        }
+    }//GEN-LAST:event_jButtonPromoActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonDelete;
     private javax.swing.JButton jButtonEdit;
     private javax.swing.JButton jButtonExit;
     private javax.swing.JButton jButtonNew;
+    private javax.swing.JButton jButtonPromo;
     private javax.swing.JButton jButtonSearch;
     private javax.swing.JComboBox jComboBoxField;
     private javax.swing.JLabel jLabelSpinner;
