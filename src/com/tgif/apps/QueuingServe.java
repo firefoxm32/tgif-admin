@@ -45,7 +45,12 @@ public class QueuingServe extends javax.swing.JFrame {
 
         @Override
         public void queTask() {
-            getOrders("9");
+            getOrderTable1("1");
+            getOrderTable2("2");
+            getOrderTable3("3");
+            getOrderTable4("4");
+            getOrderTable5("5");
+            getOrderTable6("6");
             System.out.println("1");
         }
     }
@@ -58,10 +63,38 @@ public class QueuingServe extends javax.swing.JFrame {
         TableManager.setModel(jXTable5, jScrollPane5, null, header, false, false, 0, cellEditable, width);
         TableManager.setModel(jXTable6, jScrollPane6, null, header, false, false, 0, cellEditable, width);
         jXTable1.setRowHeight(jXTable1.getRowHeight() * 2);
+        jXTable2.setRowHeight(jXTable2.getRowHeight() * 2);
+        jXTable3.setRowHeight(jXTable3.getRowHeight() * 2);
+        jXTable4.setRowHeight(jXTable4.getRowHeight() * 2);
+        jXTable5.setRowHeight(jXTable5.getRowHeight() * 2);
+        jXTable6.setRowHeight(jXTable6.getRowHeight() * 2);
     }
 
-    private void getOrders(String tableNumber) {
+    private void getOrderTable1(String tableNumber) {
         TableManager.getTableModel(jXTable1).setRowCount(0);
+        ServeDao serveDao = new ServeDao();
+//        List<OrderDetail> orderDetail = new ArrayList<>();
+        id = new ArrayList<>();
+        for (OrderDetail orderDetail : serveDao.getDetailOrders(tableNumber)) {
+            id.add(orderDetail.getId());
+            String sauces = "";
+            for (int i = 0; i < orderDetail.getSauces().size(); i++) {
+                sauces += orderDetail.getSauces().get(i).getAbbreviation() + ", ";
+            }
+            String subSauces = sauces.substring(0, sauces.length() - 2);
+            String description = orderDetail.getFoodItem().getItemName() + ", Serving: "
+                    + orderDetail.getServing().getAbbreviation()
+                    + ", Sauce/s: (" + subSauces
+                    + "), Side Dish: " + orderDetail.getSideDish().getAbbreviation();
+            TableManager.getTableModel(jXTable1).addRow(new Object[]{
+                description,
+                orderDetail.getQty()
+            });
+        }
+    }
+
+    private void getOrderTable2(String tableNumber) {
+        TableManager.getTableModel(jXTable2).setRowCount(0);
         ServeDao serveDao = new ServeDao();
 //        List<OrderDetail> orderDetail = new ArrayList<>();
         id = new ArrayList<>();
@@ -75,7 +108,99 @@ public class QueuingServe extends javax.swing.JFrame {
             String description = orderDetail.getServing().getAbbreviation()
                     + ", Sauce/s: " + subSauces
                     + ", Side Dish: " + orderDetail.getSideDish().getAbbreviation();
-            TableManager.getTableModel(jXTable1).addRow(new Object[]{
+            TableManager.getTableModel(jXTable2).addRow(new Object[]{
+                orderDetail.getFoodItem().getItemName() + ", Serving: "
+                + description,
+                orderDetail.getQty()
+            });
+        }
+    }
+
+    private void getOrderTable3(String tableNumber) {
+        TableManager.getTableModel(jXTable3).setRowCount(0);
+        ServeDao serveDao = new ServeDao();
+//        List<OrderDetail> orderDetail = new ArrayList<>();
+        id = new ArrayList<>();
+        for (OrderDetail orderDetail : serveDao.getDetailOrders(tableNumber)) {
+            id.add(orderDetail.getId());
+            String sauces = "";
+            for (int i = 0; i < orderDetail.getSauces().size(); i++) {
+                sauces += orderDetail.getSauces().get(i).getAbbreviation() + ", ";
+            }
+            String subSauces = sauces.substring(0, sauces.length() - 2);
+            String description = orderDetail.getFoodItem().getItemName() + ", Serving: ("
+                    + orderDetail.getServing().getAbbreviation()
+                    + "), Sauce/s: (" + subSauces
+                    + "), Side Dish: (" + orderDetail.getSideDish().getAbbreviation() + ")";
+            TableManager.getTableModel(jXTable3).addRow(new Object[]{
+                description,
+                orderDetail.getQty()
+            });
+        }
+    }
+
+    private void getOrderTable4(String tableNumber) {
+        TableManager.getTableModel(jXTable4).setRowCount(0);
+        ServeDao serveDao = new ServeDao();
+//        List<OrderDetail> orderDetail = new ArrayList<>();
+        id = new ArrayList<>();
+        for (OrderDetail orderDetail : serveDao.getDetailOrders(tableNumber)) {
+            id.add(orderDetail.getId());
+            String sauces = "";
+            for (int i = 0; i < orderDetail.getSauces().size(); i++) {
+                sauces += orderDetail.getSauces().get(i).getAbbreviation() + ", ";
+            }
+            String subSauces = sauces.substring(0, sauces.length() - 2);
+            String description = orderDetail.getServing().getAbbreviation()
+                    + ", Sauce/s: " + subSauces
+                    + ", Side Dish: " + orderDetail.getSideDish().getAbbreviation();
+            TableManager.getTableModel(jXTable4).addRow(new Object[]{
+                orderDetail.getFoodItem().getItemName() + ", Serving: "
+                + description,
+                orderDetail.getQty()
+            });
+        }
+    }
+
+    private void getOrderTable5(String tableNumber) {
+        TableManager.getTableModel(jXTable5).setRowCount(0);
+        ServeDao serveDao = new ServeDao();
+//        List<OrderDetail> orderDetail = new ArrayList<>();
+        id = new ArrayList<>();
+        for (OrderDetail orderDetail : serveDao.getDetailOrders(tableNumber)) {
+            id.add(orderDetail.getId());
+            String sauces = "";
+            for (int i = 0; i < orderDetail.getSauces().size(); i++) {
+                sauces += orderDetail.getSauces().get(i).getAbbreviation() + ", ";
+            }
+            String subSauces = sauces.substring(0, sauces.length() - 2);
+            String description = orderDetail.getServing().getAbbreviation()
+                    + ", Sauce/s: " + subSauces
+                    + ", Side Dish: " + orderDetail.getSideDish().getAbbreviation();
+            TableManager.getTableModel(jXTable5).addRow(new Object[]{
+                orderDetail.getFoodItem().getItemName() + ", Serving: "
+                + description,
+                orderDetail.getQty()
+            });
+        }
+    }
+
+    private void getOrderTable6(String tableNumber) {
+        TableManager.getTableModel(jXTable6).setRowCount(0);
+        ServeDao serveDao = new ServeDao();
+//        List<OrderDetail> orderDetail = new ArrayList<>();
+        id = new ArrayList<>();
+        for (OrderDetail orderDetail : serveDao.getDetailOrders(tableNumber)) {
+            id.add(orderDetail.getId());
+            String sauces = "";
+            for (int i = 0; i < orderDetail.getSauces().size(); i++) {
+                sauces += orderDetail.getSauces().get(i).getAbbreviation() + ", ";
+            }
+            String subSauces = sauces.substring(0, sauces.length() - 2);
+            String description = orderDetail.getServing().getAbbreviation()
+                    + ", Sauce/s: " + subSauces
+                    + ", Side Dish: " + orderDetail.getSideDish().getAbbreviation();
+            TableManager.getTableModel(jXTable6).addRow(new Object[]{
                 orderDetail.getFoodItem().getItemName() + ", Serving: "
                 + description,
                 orderDetail.getQty()
@@ -140,6 +265,11 @@ public class QueuingServe extends javax.swing.JFrame {
 
         jButton4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jButton4.setText("Serve");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
         jPanel5.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 340, 440, 30));
 
         jScrollPane4.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -208,6 +338,11 @@ public class QueuingServe extends javax.swing.JFrame {
 
         jButton2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jButton2.setText("Serve");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
         jPanel4.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 340, 440, 30));
 
         jScrollPane2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -238,6 +373,11 @@ public class QueuingServe extends javax.swing.JFrame {
 
         jButton5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jButton5.setText("Serve");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
         jPanel6.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 340, 440, 30));
 
         jScrollPane5.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -266,6 +406,11 @@ public class QueuingServe extends javax.swing.JFrame {
 
         jButton3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jButton3.setText("Serve");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
         jPanel7.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 340, 440, 30));
 
         jScrollPane3.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -294,6 +439,11 @@ public class QueuingServe extends javax.swing.JFrame {
 
         jButton6.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jButton6.setText("Serve");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
         jPanel8.add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 340, 440, 30));
 
         jScrollPane6.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -328,9 +478,6 @@ public class QueuingServe extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonServe1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonServe1ActionPerformed
-//        System.out.println("row; "+jXTable1.getSelectedRow());
-//        System.out.println("id: "+id.get(jXTable1.getSelectedRow()));
-
         if (jXTable1.getSelectedRow() < 0) {
             JOptionPane.showMessageDialog(this, "Select data to serve");
         } else {
@@ -338,11 +485,60 @@ public class QueuingServe extends javax.swing.JFrame {
             serveDao.edit(String.valueOf(id.get(jXTable1.getSelectedRow())));
             taskRunner.run();
         }
-
     }//GEN-LAST:event_jButtonServe1ActionPerformed
 
     private void jXTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jXTable1MouseClicked
     }//GEN-LAST:event_jXTable1MouseClicked
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        if (jXTable2.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(this, "Select data to serve");
+        } else {
+            ServeDao serveDao = new ServeDao();
+            serveDao.edit(String.valueOf(id.get(jXTable2.getSelectedRow())));
+            taskRunner.run();
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        if (jXTable3.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(this, "Select data to serve");
+        } else {
+            ServeDao serveDao = new ServeDao();
+            serveDao.edit(String.valueOf(id.get(jXTable3.getSelectedRow())));
+            taskRunner.run();
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        if (jXTable4.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(this, "Select data to serve");
+        } else {
+            ServeDao serveDao = new ServeDao();
+            serveDao.edit(String.valueOf(id.get(jXTable4.getSelectedRow())));
+            taskRunner.run();
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        if (jXTable5.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(this, "Select data to serve");
+        } else {
+            ServeDao serveDao = new ServeDao();
+            serveDao.edit(String.valueOf(id.get(jXTable5.getSelectedRow())));
+            taskRunner.run();
+        }
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        if (jXTable6.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(this, "Select data to serve");
+        } else {
+            ServeDao serveDao = new ServeDao();
+            serveDao.edit(String.valueOf(id.get(jXTable6.getSelectedRow())));
+            taskRunner.run();
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
 
     /**
      * @param args the command line arguments

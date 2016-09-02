@@ -37,7 +37,7 @@ public class FormFoodItem extends javax.swing.JDialog {
     private List<Integer> rServingIds;
     private List<Integer> rSauceIds;
     private List<Integer> rSideDishIds;
-    
+
     public void setFoodItem(FoodItem foodItem) {
         this.foodItem = foodItem;
     }
@@ -45,7 +45,6 @@ public class FormFoodItem extends javax.swing.JDialog {
     public void setItemNames(List<String> itemNames) {
         this.itemNames = itemNames;
     }
-    
 
     /**
      * Creates new form FormFoodItem
@@ -59,7 +58,7 @@ public class FormFoodItem extends javax.swing.JDialog {
         listPrices = new DefaultListModel<>();
         listSauces = new DefaultListModel<>();
         listSideDishes = new DefaultListModel<>();
-        
+
         getCategory();
     }
 
@@ -347,7 +346,7 @@ public class FormFoodItem extends javax.swing.JDialog {
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
     private void jButtonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSaveActionPerformed
-        if(this.itemNames.contains(jTextFieldName.getText().toLowerCase())){
+        if (this.itemNames.contains(jTextFieldName.getText().toLowerCase()) && this.formAction.equalsIgnoreCase("add")) {
             JOptionPane.showMessageDialog(this, "Item name already exist");
             return;
         }
@@ -357,10 +356,10 @@ public class FormFoodItem extends javax.swing.JDialog {
         } else if (jComboBoxCategory.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(this, "Select category");
             jComboBoxCategory.requestFocus();
-        } else if (listServings.getSize() == 0) {
+        } else if (listServings.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Enter serving");
             jTextFieldServing.requestFocus();
-        } else if (listPrices.getSize() == 1) {
+        } else if (listPrices.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Enter price");
             jTextFieldPrice.requestFocus();
         } else if (jTextFieldimage.getText().trim().isEmpty()) {
@@ -419,45 +418,45 @@ public class FormFoodItem extends javax.swing.JDialog {
                     foodItemsDao.add(localFoodItem);
                 } else {
                     String servingId = "";
-                    String servId="";
-                    String sauceId="";
-                    String sId="";
-                    String sideDishId="";
-                    String sdId="";
-                    if(servingIds.size() > 0) {
-                        for(int i = 0; i < servingIds.size(); i++) {
+                    String servId = "";
+                    String sauceId = "";
+                    String sId = "";
+                    String sideDishId = "";
+                    String sdId = "";
+                    if (servingIds.size() > 0) {
+                        for (int i = 0; i < servingIds.size(); i++) {
                             servingId += servingIds.get(i) + ",";
                         }
                         servId = servingId.substring(0, servingId.length() - 1);
                     }
-                    if(sauceIds.size() > 0) {
-                        for(int i = 0; i < sauceIds.size(); i++) {
+                    if (sauceIds.size() > 0) {
+                        for (int i = 0; i < sauceIds.size(); i++) {
                             sauceId += sauceIds.get(i) + ",";
                         }
                         sId = sauceId.substring(0, sauceId.length() - 1);
                     }
-                    if(sideDishIds.size() > 0) {
-                        for(int i = 0; i < sideDishIds.size(); i++) {
+                    if (sideDishIds.size() > 0) {
+                        for (int i = 0; i < sideDishIds.size(); i++) {
                             sideDishId += sideDishIds.get(i) + ",";
                         }
                         sdId = sideDishId.substring(0, sideDishId.length() - 1);
                     }
                     String rServId = "", rSauceId = "", rSideDishId = "";
                     String _rServId = "", _rSauceId = "", _rSideDishId = "";
-                    if(rServingIds.size() > 0) {
-                        for(int i = 0; i < rServingIds.size(); i++) {
+                    if (rServingIds.size() > 0) {
+                        for (int i = 0; i < rServingIds.size(); i++) {
                             rServId += rServingIds.get(i) + ",";
                         }
                         _rServId = rServId.substring(0, rServId.length() - 1);
                     }
-                    if(rSauceIds.size() > 0) {
-                        for(int i = 0; i < rSauceIds.size(); i++) {
+                    if (rSauceIds.size() > 0) {
+                        for (int i = 0; i < rSauceIds.size(); i++) {
                             rSauceId += rSauceIds.get(i) + ",";
                         }
                         _rSauceId = rSauceId.substring(0, rSauceId.length() - 1);
                     }
-                    if(rSideDishIds.size() > 0) {
-                        for(int i = 0; i < rSideDishIds.size(); i++) {
+                    if (rSideDishIds.size() > 0) {
+                        for (int i = 0; i < rSideDishIds.size(); i++) {
                             rSideDishId += rSideDishIds.get(i) + ",";
                         }
                         _rSideDishId = rSideDishId.substring(0, rSideDishId.length() - 1);
@@ -470,6 +469,7 @@ public class FormFoodItem extends javax.swing.JDialog {
                     localFoodItem.setSideDishId(sdId);
                     localFoodItem.setItemId(Integer.valueOf(jTextFieldItemId.getText()));
                     foodItemsDao.editDelete(localFoodItem, this.formAction);
+                    this.dispose();
                 }
             }
             clearData();
@@ -524,10 +524,20 @@ public class FormFoodItem extends javax.swing.JDialog {
 
     private void jTextFieldPriceKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextFieldPriceKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            if (!jTextFieldPrice.getText().isEmpty()) {
+            try {
+                if (Integer.valueOf(jTextFieldPrice.getText().trim()) <= 0) {
+                    JOptionPane.showMessageDialog(this, "You inserted zero or negative number");
+                    jTextFieldPrice.requestFocus();
+                    jTextFieldPrice.selectAll();
+                    return;
+                }
                 listPrices.addElement(Double.valueOf(jTextFieldPrice.getText()));
                 jTextFieldPrice.setText("");
                 jListPrice.setModel(listPrices);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Not a number");
+                jTextFieldPrice.requestFocus();
+                jTextFieldPrice.selectAll();
             }
         }
     }//GEN-LAST:event_jTextFieldPriceKeyPressed
@@ -535,46 +545,70 @@ public class FormFoodItem extends javax.swing.JDialog {
     private void jButtonRemoveServingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveServingActionPerformed
         System.out.println("serv pos: " + jListServing.getSelectedIndex() + " " + this.formAction);
         int pos = jListServing.getSelectedIndex();
-        if (pos != -1) {
-            listServings.removeElementAt(pos);
-            if(this.formAction.equalsIgnoreCase("edit")) {
-                rServingIds.add(servingIds.get(pos));
-                servingIds.remove(pos);
-                listPrices.removeElementAt(pos);
+        if (listServings.size() > 0) {
+            if (pos != -1) {
+                if (this.formAction.equalsIgnoreCase("edit") && !listServings.isEmpty()) {
+                    rServingIds.add(servingIds.get(pos));
+                    servingIds.remove(pos);
+                    listPrices.removeElementAt(pos);
+                }
+                listServings.removeElementAt(pos);
+            } else {
+                JOptionPane.showMessageDialog(this, "Select serving to remove");
             }
+        } else {
+            JOptionPane.showMessageDialog(this, "No serving");
         }
     }//GEN-LAST:event_jButtonRemoveServingActionPerformed
 
     private void jButtonRemovePriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemovePriceActionPerformed
         System.out.println("p pos: " + jListPrice.getSelectedIndex());
         int pos = jListPrice.getSelectedIndex();
-        if (pos != -1) {
-            listPrices.removeElementAt(pos);
+        if (listPrices.size() > 0) {
+            if (pos != -1) {
+                listPrices.removeElementAt(pos);
+            } else {
+                JOptionPane.showMessageDialog(this, "Select price to remove");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "No price");
         }
-        
+
     }//GEN-LAST:event_jButtonRemovePriceActionPerformed
 
     private void jButtonRemoveSauceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveSauceActionPerformed
         System.out.println("s pos: " + jListSauce.getSelectedIndex() + " " + this.formAction);
         int pos = jListSauce.getSelectedIndex();
-        if (pos != -1) {
-            listSauces.removeElementAt(pos);
-            if(this.formAction.equalsIgnoreCase("edit")) {
-                rSauceIds.add(sauceIds.get(pos));
-                sauceIds.remove(pos);
+        if (listSauces.size() > 0) {
+            if (pos != -1) {
+                listSauces.removeElementAt(pos);
+                if (this.formAction.equalsIgnoreCase("edit") && !sauceIds.isEmpty()) {
+                    rSauceIds.add(sauceIds.get(pos));
+                    sauceIds.remove(pos);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Select sauce to remove");
             }
+        } else {
+            JOptionPane.showMessageDialog(this, "No sauce");
         }
     }//GEN-LAST:event_jButtonRemoveSauceActionPerformed
 
     private void jButtonRemoveSideDishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveSideDishActionPerformed
         System.out.println("sd pos: " + jListSideDish.getSelectedIndex() + " " + this.formAction);
         int pos = jListSideDish.getSelectedIndex();
-        if (pos != -1) {
-            listSideDishes.removeElementAt(pos);
-            if(this.formAction.equalsIgnoreCase("edit")) {
-                rSideDishIds.add(sideDishIds.get(pos));
-                sideDishIds.remove(pos);
+        if (listSideDishes.size() > 0) {
+            if (pos != -1) {
+                listSideDishes.removeElementAt(pos);
+                if (this.formAction.equalsIgnoreCase("edit") && !sideDishIds.isEmpty()) {
+                    rSideDishIds.add(sideDishIds.get(pos));
+                    sideDishIds.remove(pos);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Select side dish to remove");
             }
+        } else {
+            JOptionPane.showMessageDialog(this, "No side dish");
         }
     }//GEN-LAST:event_jButtonRemoveSideDishActionPerformed
 

@@ -172,13 +172,14 @@ public class FormPromo extends javax.swing.JDialog {
 //            JOptionPane.showMessageDialog(this, "Not a number or less than 0");
 //            return;
 //        }
-//        FoodItemsDao foodItemsDao = new FoodItemsDao();
-//        FoodItem localFoodItem = new FoodItem();
-//        localFoodItem.setItemId(Integer.valueOf(jTextFieldItemId.getText()));
-//        localFoodItem.setPromoPrice(Double.valueOf(jTextFieldPromoPrice.getText()));
-//        String status = jRadioButtonActive.isSelected() ? "A" : "I";
-//        localFoodItem.setPromoStatus(status);
-//        foodItemsDao.addEditPromo(localFoodItem);
+        FoodItemsDao foodItemsDao = new FoodItemsDao();
+        FoodItem localFoodItem = new FoodItem();
+        localFoodItem.setItemId(Integer.valueOf(jTextFieldItemId.getText()));
+        localFoodItem.setPromoPrice(Double.valueOf(jTextFieldPromoPrice.getText()));
+        String status = jRadioButtonActive.isSelected() ? "A" : "I";
+        localFoodItem.setPromoStatus(status);
+        foodItemsDao.addEditPromo(localFoodItem);
+        this.dispose();
     }//GEN-LAST:event_jButtonSaveActionPerformed
 
     private void jRadioButtonInactiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonInactiveActionPerformed

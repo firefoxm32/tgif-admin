@@ -307,7 +307,6 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
             formPromo.setFoodItem(foodItem);
             formPromo.setData();
             formPromo.setVisible(true);
-            formPromo.dispose();
             getfoodItem("", "");
         } else {
             JOptionPane.showMessageDialog(this, "Select record to edit");

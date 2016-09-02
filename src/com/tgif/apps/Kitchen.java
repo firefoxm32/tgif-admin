@@ -45,7 +45,12 @@ public class Kitchen extends javax.swing.JFrame {
 
         @Override
         public void queTask() {
-            getOrders("9");
+            getOrders1("1");
+            getOrders2("2");
+            getOrders3("3");
+            getOrders4("4");
+            getOrders5("5");
+            getOrders6("6");
         }
     }
     
@@ -58,9 +63,19 @@ public class Kitchen extends javax.swing.JFrame {
         TableManager.setModel(jXTable6, jScrollPane6, null, header, false, false, 0, cellEditable, width);
         jXTable1.setRowHeight(jXTable1.getRowHeight() * 2);
         jXTable1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        jXTable2.setRowHeight(jXTable2.getRowHeight() * 2);
+        jXTable2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        jXTable3.setRowHeight(jXTable3.getRowHeight() * 2);
+        jXTable3.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        jXTable4.setRowHeight(jXTable4.getRowHeight() * 2);
+        jXTable4.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        jXTable5.setRowHeight(jXTable5.getRowHeight() * 2);
+        jXTable5.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        jXTable6.setRowHeight(jXTable6.getRowHeight() * 2);
+        jXTable6.setFont(new Font("Tahoma", Font.PLAIN, 12));
     }   
     
-    private void getOrders(String tableNumber) {
+    private void getOrders1(String tableNumber) {
         TableManager.getTableModel(jXTable1).setRowCount(0);
         ServeDao serveDao = new ServeDao();
 //        List<OrderDetail> orderDetail = new ArrayList<>();
@@ -82,7 +97,117 @@ public class Kitchen extends javax.swing.JFrame {
             });
         }
     }
+    private void getOrders2(String tableNumber) {
+        TableManager.getTableModel(jXTable2).setRowCount(0);
+        ServeDao serveDao = new ServeDao();
+//        List<OrderDetail> orderDetail = new ArrayList<>();
+        id = new ArrayList<>();
+        for(OrderDetail orderDetail: serveDao.getDetailOrders(tableNumber)) {
+            id.add(orderDetail.getId());
+            String sauces="";
+            for (int i = 0; i < orderDetail.getSauces().size(); i++) {
+                sauces += orderDetail.getSauces().get(i).getAbbreviation() + ", ";
+            }
+            String subSauces = sauces.substring(0, sauces.length() - 2);
+            String description = orderDetail.getServing().getAbbreviation() + 
+                    ", Sauce/s: " + subSauces +
+                    ", Side Dish: " + orderDetail.getSideDish().getAbbreviation();
+            TableManager.getTableModel(jXTable2).addRow(new Object[]{
+                orderDetail.getFoodItem().getItemName() + ", Serving: " + 
+                description,
+                orderDetail.getQty()
+            });
+        }
+    }
+    private void getOrders3(String tableNumber) {
+        TableManager.getTableModel(jXTable3).setRowCount(0);
+        ServeDao serveDao = new ServeDao();
+//        List<OrderDetail> orderDetail = new ArrayList<>();
+        id = new ArrayList<>();
+        for(OrderDetail orderDetail: serveDao.getDetailOrders(tableNumber)) {
+            id.add(orderDetail.getId());
+            String sauces="";
+            for (int i = 0; i < orderDetail.getSauces().size(); i++) {
+                sauces += orderDetail.getSauces().get(i).getAbbreviation() + ", ";
+            }
+            String subSauces = sauces.substring(0, sauces.length() - 2);
+            String description = orderDetail.getServing().getAbbreviation() + 
+                    ", Sauce/s: " + subSauces +
+                    ", Side Dish: " + orderDetail.getSideDish().getAbbreviation();
+            TableManager.getTableModel(jXTable3).addRow(new Object[]{
+                orderDetail.getFoodItem().getItemName() + ", Serving: " + 
+                description,
+                orderDetail.getQty()
+            });
+        }
+    }
     
+    private void getOrders4(String tableNumber) {
+        TableManager.getTableModel(jXTable4).setRowCount(0);
+        ServeDao serveDao = new ServeDao();
+//        List<OrderDetail> orderDetail = new ArrayList<>();
+        id = new ArrayList<>();
+        for(OrderDetail orderDetail: serveDao.getDetailOrders(tableNumber)) {
+            id.add(orderDetail.getId());
+            String sauces="";
+            for (int i = 0; i < orderDetail.getSauces().size(); i++) {
+                sauces += orderDetail.getSauces().get(i).getAbbreviation() + ", ";
+            }
+            String subSauces = sauces.substring(0, sauces.length() - 2);
+            String description = orderDetail.getServing().getAbbreviation() + 
+                    ", Sauce/s: " + subSauces +
+                    ", Side Dish: " + orderDetail.getSideDish().getAbbreviation();
+            TableManager.getTableModel(jXTable4).addRow(new Object[]{
+                orderDetail.getFoodItem().getItemName() + ", Serving: " + 
+                description,
+                orderDetail.getQty()
+            });
+        }
+    }
+    private void getOrders5(String tableNumber) {
+        TableManager.getTableModel(jXTable5).setRowCount(0);
+        ServeDao serveDao = new ServeDao();
+//        List<OrderDetail> orderDetail = new ArrayList<>();
+        id = new ArrayList<>();
+        for(OrderDetail orderDetail: serveDao.getDetailOrders(tableNumber)) {
+            id.add(orderDetail.getId());
+            String sauces="";
+            for (int i = 0; i < orderDetail.getSauces().size(); i++) {
+                sauces += orderDetail.getSauces().get(i).getAbbreviation() + ", ";
+            }
+            String subSauces = sauces.substring(0, sauces.length() - 2);
+            String description = orderDetail.getServing().getAbbreviation() + 
+                    ", Sauce/s: " + subSauces +
+                    ", Side Dish: " + orderDetail.getSideDish().getAbbreviation();
+            TableManager.getTableModel(jXTable5).addRow(new Object[]{
+                orderDetail.getFoodItem().getItemName() + ", Serving: " + 
+                description,
+                orderDetail.getQty()
+            });
+        }
+    }
+    private void getOrders6(String tableNumber) {
+        TableManager.getTableModel(jXTable6).setRowCount(0);
+        ServeDao serveDao = new ServeDao();
+//        List<OrderDetail> orderDetail = new ArrayList<>();
+        id = new ArrayList<>();
+        for(OrderDetail orderDetail: serveDao.getDetailOrders(tableNumber)) {
+            id.add(orderDetail.getId());
+            String sauces="";
+            for (int i = 0; i < orderDetail.getSauces().size(); i++) {
+                sauces += orderDetail.getSauces().get(i).getAbbreviation() + ", ";
+            }
+            String subSauces = sauces.substring(0, sauces.length() - 2);
+            String description = orderDetail.getServing().getAbbreviation() + 
+                    ", Sauce/s: " + subSauces +
+                    ", Side Dish: " + orderDetail.getSideDish().getAbbreviation();
+            TableManager.getTableModel(jXTable6).addRow(new Object[]{
+                orderDetail.getFoodItem().getItemName() + ", Serving: " + 
+                description,
+                orderDetail.getQty()
+            });
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
