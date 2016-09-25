@@ -4,12 +4,19 @@
  */
 package com.tgif.view;
 
+import com.tgif.connection.DBConnection;
 import com.tgif.dao.CashierDao;
 import com.tgif.model.TransactionDetail;
 import com.tgif.model.TransactionHeader;
 import com.tgif.util.TableManager;
 import java.awt.Font;
+import java.util.HashMap;
 import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -20,8 +27,9 @@ public class FormTransactionDetail extends javax.swing.JDialog {
 
     private String[] header = {"Detail", "price", "quantity"};
     private boolean[] cellEditable = {false, false, false};
-    private int[] width = {633, 100, 100};
-
+    private int[] width = {578, 100, 100};
+    JasperReport jasperReport;
+    JasperPrint jasperPrint;
     /**
      * Creates new form FormTransactionDetail
      */
@@ -30,6 +38,7 @@ public class FormTransactionDetail extends javax.swing.JDialog {
         initComponents();
         this.setTitle("Table " + tableNumber + " Order Details");
         jLabelTableNumber.setText(String.valueOf(tableNumber));
+        jButtonCheckOut.requestFocus();
         initTable();
     }
 
@@ -46,6 +55,7 @@ public class FormTransactionDetail extends javax.swing.JDialog {
         CashierDao cashierDao = new CashierDao();
         TableManager.getTableModel(jTableTransactionDetails).setRowCount(0);
         for (TransactionDetail detail : cashierDao.getTransactionDetails(Integer.valueOf(jLabelTableNumber.getText()))) {
+            System.out.println("here");
             jTextFieldTransactionId.setText(detail.getTransactionId());
             String sauce = "";
             credit = detail.getCredit();
@@ -53,8 +63,12 @@ public class FormTransactionDetail extends javax.swing.JDialog {
             for (int i = 0; i < detail.getSauce().size(); i++) {
                 sauce = detail.getSauce().get(i).getAbbreviation() + ", ";
             }
+            String sauces="";
+            if (!sauce.isEmpty()) {
+                sauces = sauce.substring(0, sauce.length() - 2);
+            }
             String details = detail.getFoodItem().getItemName() + ", Serving: (" + detail.getServing().getAbbreviation() + "), "
-                    + "Sauce/s: (" + sauce.substring(0, sauce.length() - 2) + "), Side Dish: (" + detail.getSideDish().getAbbreviation() + ")";
+                    + "Sauce/s: (" + sauces + "), Side Dish: (" + detail.getSideDish().getAbbreviation() + ")";
             TableManager.getTableModel(jTableTransactionDetails).addRow(new Object[]{
                 details,
                 detail.getPrice(),
@@ -106,7 +120,7 @@ public class FormTransactionDetail extends javax.swing.JDialog {
         ));
         jScrollPane1.setViewportView(jTableTransactionDetails);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 0, 840, 460));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 10, 780, 350));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel1.setText("Cash Amount:");
@@ -125,8 +139,8 @@ public class FormTransactionDetail extends javax.swing.JDialog {
         jPanel1.add(jLabelCash, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, -1, -1));
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel5.setText("Total Amount:");
-        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, -1, -1));
+        jLabel5.setText("Total:");
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 90, -1));
 
         jLabelTotal.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabelTotal.setText("0.00");
@@ -139,7 +153,7 @@ public class FormTransactionDetail extends javax.swing.JDialog {
                 jButtonCheckOutActionPerformed(evt);
             }
         });
-        jPanel1.add(jButtonCheckOut, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 290, 140, 60));
+        jPanel1.add(jButtonCheckOut, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 300, 140, 60));
 
         jButtonClose.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jButtonClose.setText("Close");
@@ -148,7 +162,7 @@ public class FormTransactionDetail extends javax.swing.JDialog {
                 jButtonCloseActionPerformed(evt);
             }
         });
-        jPanel1.add(jButtonClose, new org.netbeans.lib.awtextra.AbsoluteConstraints(890, 470, 110, 40));
+        jPanel1.add(jButtonClose, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 370, 110, 40));
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel6.setText("Table Number:");
@@ -163,13 +177,13 @@ public class FormTransactionDetail extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 1014, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 950, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 521, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 419, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
@@ -181,11 +195,12 @@ public class FormTransactionDetail extends javax.swing.JDialog {
 
     private void jButtonCheckOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCheckOutActionPerformed
         CashierDao cashierDao = new CashierDao();
-        int result = JOptionPane.showConfirmDialog(this, "Chec Out", "Check Out", JOptionPane.YES_NO_OPTION);
+        int result = JOptionPane.showConfirmDialog(this, "Check Out", "Confirmation", JOptionPane.YES_NO_OPTION);
         if (result == JOptionPane.NO_OPTION) {
-            JOptionPane.showMessageDialog(this, "Cancel");
+//            JOptionPane.showMessageDialog(this, "Cancel");
             return;
         }
+        printReport();
         TransactionHeader transactionHeader = new TransactionHeader();
         transactionHeader.setTransactionId(jTextFieldTransactionId.getText());
         transactionHeader.setCashAmount(Double.valueOf(jLabelCash.getText()));
@@ -199,6 +214,41 @@ public class FormTransactionDetail extends javax.swing.JDialog {
             System.out.println("null");
         }
     }//GEN-LAST:event_jButtonCheckOutActionPerformed
+     private void printReport() {
+
+        try {
+
+            HashMap map = new HashMap();
+
+      
+            map.put("transaction_id", jTextFieldTransactionId.getText().trim());
+            
+            System.out.println(map);
+            String path = "/report/tgif_recipe.jasper";
+
+            print(map, path);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void print(HashMap params, String reportPath){
+        try {
+             // System.out.println(params);
+                    //JasperReport jasperReport = (JasperReport)JRLoader.loadObject(getClass().getResource("/sample_report/sample_print.jasper"));
+                   jasperReport = (JasperReport) JRLoader.loadObject(getClass().getResource(reportPath));
+                              
+                   // JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params , db.connect());
+                   DBConnection db = new DBConnection();
+                   jasperPrint = JasperFillManager.fillReport(jasperReport, params, db.connect());
+                   JasperViewer.viewReport(jasperPrint, false);
+        }
+        catch (Exception e) {
+//            MessageDialog.show(CustomerService.JFParent, e);
+            e.printStackTrace();
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */

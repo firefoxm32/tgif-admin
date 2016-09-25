@@ -30,6 +30,7 @@ public class CategoryDao {
     public List<Category> getMenusData(String param) {
         List<Category> list = new ArrayList();
         //build url with query param (optional)
+        System.out.println("URI: "+Globals.URI);
         String url = new URLBuilder()
                 .host(Globals.URI)
                 .addPathSegment("admin/get-food-menus.php")
@@ -59,7 +60,7 @@ public class CategoryDao {
                     JSONObject object = arrData.getJSONObject(i);
 
                     int id = object.getInt("id");
-                    String name = object.getString("label");
+                    String name = object.getString("menu_name");
                     int itemsCount = object.getInt("ctr");
 
                     Category category = new Category();

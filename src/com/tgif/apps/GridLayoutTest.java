@@ -4,20 +4,26 @@
  */
 package com.tgif.apps;
 
+import com.tgif.dao.CashierDao;
+import com.tgif.model.Table;
+import com.tgif.util.Task;
+import com.tgif.util.TaskRunner;
+import com.tgif.view.FormTransactionDetail;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 
 /**
  *
@@ -26,6 +32,15 @@ import javax.swing.JPanel;
 public class GridLayoutTest extends javax.swing.JFrame {
 
     public static Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+//    private String[] header = {"id", "Item Description", "Qty"};
+//    private boolean[] cellEditable = {false, false, false};
+//    private int[] width = {40, 338, 72};
+    private JLabel[] jLabeltableNum;
+    private JLabel[] jLabelstatus;
+    private JPanel[] jpanel2;
+    private TaskRunner taskRunner;
+    private CashierDao cashierDao;
+    private int x;
 
     /**
      * Creates new form GridLayout
@@ -33,103 +48,121 @@ public class GridLayoutTest extends javax.swing.JFrame {
     public GridLayoutTest() {
         initComponents();
         setExtendedState(MAXIMIZED_BOTH);
-        gridLayout();
+        taskRunner = new TaskRunner();
+        cashierDao = new CashierDao();
+        gridLayout(6);
     }
-    private JLabel[] tableNum;
-    private JPanel[] tables;
-    private JLabel[] status;
-    private int i;
-    private int tableCount = 25;
 
-    private void gridLayout() {
+    private void gridLayout(int size) {
+        jLabelstatus = new JLabel[size];
+        jLabeltableNum = new JLabel[size];
+        jpanel2 = new JPanel[6];
 
-        Color color[] = new Color[]{
-            Color.yellow, Color.green, Color.blue,
-            Color.pink, Color.red, Color.DARK_GRAY,
-            Color.DARK_GRAY, Color.DARK_GRAY, Color.DARK_GRAY,
-            Color.DARK_GRAY, Color.DARK_GRAY, Color.DARK_GRAY, Color.DARK_GRAY,
-            Color.DARK_GRAY, Color.DARK_GRAY, Color.DARK_GRAY, Color.DARK_GRAY,
-            Color.DARK_GRAY, Color.DARK_GRAY, Color.DARK_GRAY, Color.DARK_GRAY,
-            Color.DARK_GRAY, Color.DARK_GRAY, Color.DARK_GRAY, Color.DARK_GRAY
-        };
-        tableNum = new JLabel[tableCount];
-        tables = new JPanel[tableCount];
-        status = new JLabel[tableCount];
-        GridLayout gLayout;
-        if (tableCount == 1) {
-            gLayout = new GridLayout(0, 1);
-            gLayout.setHgap(5);
-            gLayout.setVgap(5);
-            jPanel1.setLayout(gLayout);
-        } else if (tableCount < 11) {
-            if ((tableCount % 2) == 0) {
-                gLayout = new GridLayout(2, 3);
-                gLayout.setHgap(5);
-                gLayout.setVgap(5);
-                jPanel1.setLayout(gLayout);
-            } else if ((tableCount % 1) == 0) {
-                gLayout = new GridLayout(3, 3);
-                gLayout.setHgap(5);
-                gLayout.setVgap(5);
-                jPanel1.setLayout(gLayout);
-            }
-        } else if (tableCount > 10) {
-            if ((tableCount % 2) == 0) {
-                System.out.println("here1");
-                gLayout = new GridLayout(4, 4);
-                gLayout.setHgap(5);
-                gLayout.setVgap(5);
-                jPanel1.setLayout(gLayout);
+        GridLayout gLayout = new GridLayout(2, 3);
+        gLayout.setHgap(5);
+        gLayout.setVgap(5);
+        jPanel1.setLayout(gLayout);
+        jPanel1.setBackground(Color.DARK_GRAY);
+        for (int i = 0; i < size; i++) {
+            jpanel2[i] = new JPanel();
+            jLabeltableNum[i] = new JLabel("Table #" + (i + 1), SwingConstants.CENTER);
+            jLabelstatus[i] = new JLabel("", SwingConstants.CENTER);
 
-            } else if ((tableCount % 1) == 0) {
-                System.out.println("here");
-                gLayout = new GridLayout(5, 5);
-                gLayout.setHgap(5);
-                gLayout.setVgap(5);
-                jPanel1.setLayout(gLayout);
+            jpanel2[i].setLayout(new BoxLayout(jpanel2[i], BoxLayout.Y_AXIS));
 
-            }
-        } else {
-            System.out.println("error");
+            jLabeltableNum[i].setOpaque(true);
+            jLabeltableNum[i].setBackground(Color.YELLOW);
+            jLabeltableNum[i].setFont(new Font("Tahoma", Font.PLAIN, 26));
+            jLabeltableNum[i].setMaximumSize(new Dimension(getMaximumSize().width, getMinimumSize().height));
+
+            jLabelstatus[i].setOpaque(true);
+            jLabelstatus[i].setBackground(Color.LIGHT_GRAY);
+            jLabelstatus[i].setFont(new Font("Tahoma", Font.PLAIN, 30));
+            jLabelstatus[i].setMaximumSize(new Dimension(getMaximumSize().width, getMaximumSize().height));
+
+            jpanel2[i].add(jLabeltableNum[i]);
+            jpanel2[i].add(jLabelstatus[i]);
+
+            jPanel1.add(jpanel2[i]);
         }
-
         jPanel1.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        for (i = 0; i < tableCount; i++) {
-            tables[i] = new JPanel();
-            tables[i].setLayout(new BoxLayout(tables[i], BoxLayout.Y_AXIS));
-            jPanel1.add(tables[i]);
-            tables[i].setBackground(color[i]);
-            tables[i].setName("#" + (i + 1));
 
-            tables[i].addMouseListener(new MouseAdapter() {
+        clickedTable();
+        threading();
+
+        this.pack();
+    }
+
+    private void threading() {
+        taskRunner.setTask(new TaskOrder());
+        taskRunner.setDelay(5000);
+        taskRunner.run();
+    }
+
+    private class TaskOrder implements Task {
+
+        @Override
+        public void queTask() {
+            int i;
+            for (i = 0; i < jpanel2.length; i++) {
+                setTableStatus(i, jLabelstatus[i]);
+            }
+        }
+    }
+
+    private void setTableStatus(int index, JLabel labelStatus) {
+        List<Table> tablesList = cashierDao.getTableStatus();
+        if (tablesList.get(index).getStatus().equalsIgnoreCase("w")) {
+            labelStatus.setText("Waiting");
+            labelStatus.setBackground(Color.LIGHT_GRAY);
+        } else if (tablesList.get(index).getStatus().equalsIgnoreCase("o")) {
+            labelStatus.setText("Occupied");
+            labelStatus.setBackground(Color.GREEN);
+        } else if (tablesList.get(index).getStatus().equalsIgnoreCase("c")) {
+            labelStatus.setText("Check Out");
+            labelStatus.setBackground(Color.RED);
+        } else {
+            labelStatus.setBackground(Color.BLACK);
+        }
+        labelStatus.revalidate();
+    }
+
+    private void clickedTable() {
+        for (x = 0; x < jLabelstatus.length; x++) {
+            jpanel2[x].addMouseListener(new MouseAdapter() {
                 private int myIndex;
-                // inner class
 
                 {
-                    this.myIndex = i;
+                    this.myIndex = x;
                 }
 
                 @Override
                 public void mouseClicked(MouseEvent me) {
                     super.mouseClicked(me); //To change body of generated methods, choose Tools | Templates.
-                    JOptionPane.showMessageDialog(null, tables[myIndex].getName());
+//                    System.out.println("index: " + (myIndex + 1));
+                    if (jLabelstatus[myIndex].getText().equalsIgnoreCase("Waiting") || jLabelstatus[myIndex].getText().equalsIgnoreCase("Occupied")) {
+                        JOptionPane.showMessageDialog(null, "Not Check Out");
+                    } else {
+                        callForm(myIndex + 1);
+                    }
                 }
             });
+        }
+    }
 
-            tableNum[i] = new JLabel();
-            tableNum[i].setFont(new Font("Tahoma", Font.PLAIN, 24));
-            tableNum[i].setText("#" + (i + 1));
-            tableNum[i].setAlignmentX(Component.CENTER_ALIGNMENT);
+    private void callForm(int tableNumber) {
+        taskRunner.destroy();
+        FormTransactionDetail form = new FormTransactionDetail(this, true, tableNumber);
+        form.setLocationRelativeTo(null);
+        form.setVisible(true);
+        taskRunner.run();
+    }
 
-            status[i] = new JLabel();
-            status[i].setFont(new Font("Tahoma", Font.PLAIN, 24));
-            status[i].setText("Waiting");
-            status[i].setAlignmentX(Component.CENTER_ALIGNMENT);
-            
-//            tables[i].add(Box.createHorizontalBox());
-            tables[i].add(tableNum[i]);
-            tables[i].add(Box.createRigidArea(new Dimension(0, 30)));
-            tables[i].add(status[i]);
+    private static void setSystemLookAndFeel() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -204,6 +237,7 @@ public class GridLayoutTest extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+                setSystemLookAndFeel();
                 new GridLayoutTest().setVisible(true);
             }
         });

@@ -62,8 +62,8 @@ public class FoodItemsDao {
 
                     int itemId = object.getInt("item_id");
                     int id = object.getInt("menu_id");
-                    String categoryName = object.getString("label");
-                    String foodItemName = object.getString("menu_name");
+                    String categoryName = object.getString("menu_name");
+                    String foodItemName = object.getString("item_name");
                     String image = object.getString("image");
 //                    String description = object.getString("description");
                     String description = String.valueOf(object.get("description"));
@@ -96,7 +96,7 @@ public class FoodItemsDao {
     public void add(FoodItem foodItem) {
         //post param
         RequestBody body = new FormBody.Builder()
-                .add("category_id", String.valueOf(foodItem.getCategory().getId()))
+                .add("menu_id", String.valueOf(foodItem.getCategory().getId()))
                 .add("item_name", foodItem.getItemName())
                 .add("image", foodItem.getImage())
                 .add("description", foodItem.getDescription())
@@ -145,7 +145,7 @@ public class FoodItemsDao {
         //post param
         RequestBody body = new FormBody.Builder()
                 .add("item_id", String.valueOf(foodItem.getItemId()))
-                .add("category_id", String.valueOf(foodItem.getCategory().getId()))
+                .add("menu_id", String.valueOf(foodItem.getCategory().getId()))
                 .add("item_name", foodItem.getItemName())
                 .add("image", foodItem.getImage())
                 .add("description", foodItem.getDescription())

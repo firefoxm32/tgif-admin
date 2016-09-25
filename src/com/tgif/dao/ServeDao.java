@@ -6,7 +6,6 @@ package com.tgif.dao;
 
 import com.tgif.model.FoodItem;
 import com.tgif.model.OrderDetail;
-import com.tgif.model.OrderHeader;
 import com.tgif.model.Sauce;
 import com.tgif.model.Serving;
 import com.tgif.model.SideDish;
@@ -63,8 +62,8 @@ public class ServeDao {
                     OrderDetail orderDetail = new OrderDetail();
                     
                     orderDetail.setId(object.getInt("id"));
-                    orderDetail.setQty(object.getInt("qty"));
-                    orderDetail.setTableNumber(object.getInt("table_number"));
+                    orderDetail.setQty(object.getInt("quantity"));
+//                    orderDetail.setTableNumber(object.getInt("table_number"));
                     
                     FoodItem foodItem = new FoodItem();
                     foodItem.setItemId(object.getInt("item_id"));
@@ -72,11 +71,11 @@ public class ServeDao {
                     
                     Serving serving = new Serving();
                     serving.setServingName(object.getString("serving"));
-                    serving.setAbbreviation(object.getString("fs_abbreviation"));
+                    serving.setAbbreviation(object.getString("serving_code"));
                     
                     SideDish sideDish = new SideDish();
                     sideDish.setSideDishName(String.valueOf(object.get("side_dish")));
-                    sideDish.setAbbreviation(String.valueOf(object.get("sd_abbreviation")));
+                    sideDish.setAbbreviation(String.valueOf(object.get("side_dish_code")));
                     
                     orderDetail.setFoodItem(foodItem);
                     orderDetail.setServing(serving);
@@ -88,7 +87,7 @@ public class ServeDao {
                         JSONObject objSauce = arrSauce.getJSONObject(j);
                         Sauce sauce = new Sauce();
                         sauce.setSauceName(objSauce.getString("sauce_name"));
-                        sauce.setAbbreviation(objSauce.getString("s_abbreviation"));
+                        sauce.setAbbreviation(objSauce.getString("sauce_code"));
                         sauces.add(sauce);
                     }
                     orderDetail.setSauces(sauces);
@@ -133,7 +132,8 @@ public class ServeDao {
             if ("error".equals(status)) {
                 JOptionPane.showMessageDialog(null, message);
             } else {
-                JOptionPane.showMessageDialog(null, message);
+//                JOptionPane.showMessageDialog(null, message);
+                System.out.println(message);
             }
         } catch (Exception e) {
             e.printStackTrace();

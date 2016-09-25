@@ -10,22 +10,20 @@ import com.tgif.util.Task;
 import com.tgif.util.TaskRunner;
 import com.tgif.view.FormTransactionDetail;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import static java.awt.Frame.MAXIMIZED_BOTH;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 
 /**
  *
@@ -35,12 +33,11 @@ public class Cashier extends javax.swing.JFrame {
 
     public static Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
     private JLabel[] jLabeltableNum;
-    private JPanel[] jPaneltables;
     private JLabel[] jLabelstatus;
-    private JLabel[] jLabelWaiting;
-    private int i;
+    private JPanel[] jpanel2;
+    private TaskRunner taskRunner;
+    private CashierDao cashierDao;
     private int x;
-    private TaskRunner taskRunner = new TaskRunner();
 
     /**
      * Creates new form Kitchen
@@ -48,21 +45,10 @@ public class Cashier extends javax.swing.JFrame {
     public Cashier() {
         initComponents();
         setExtendedState(MAXIMIZED_BOTH);
-        gridLayout();
-//        threading();
-    }
-
-    private void threading() {
-        taskRunner.setTask(new Cashier.CashierTask());
-        taskRunner.setDelay(2000);
-        taskRunner.run();
-    }
-
-    private List<Table> a() {
-        CashierDao cashierDao = new CashierDao();
-        List<Table> tablesList = cashierDao.getTableStatus();
-
-        return tablesList;
+        taskRunner = new TaskRunner();
+        cashierDao = new CashierDao();
+        gridLayout(6);
+//        jPanelMenu.setMaximumSize(new Dimension(getMaximumSize().width, 50));
     }
 
     /**
@@ -79,82 +65,101 @@ public class Cashier extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 407, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 270, Short.MAX_VALUE)
-        );
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 407, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
         );
 
         getAccessibleContext().setAccessibleParent(this);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    protected JPanel jPanelMenu;
 
-    private void gridLayout() {
-        int tableCount = a().size();
-        jPaneltables = new JPanel[tableCount];
-        GridLayout gLayout = new GridLayout();
-        gLayout.setHgap(5);
-        gLayout.setVgap(5);
+    private void gridLayout(int size) {
+        jLabelstatus = new JLabel[size];
+        jLabeltableNum = new JLabel[size];
+        jpanel2 = new JPanel[6];
 
-        if (tableCount == 1) {
-            gLayout.setRows(1);
-            gLayout.setColumns(1);
-        } else if (tableCount
-                < 11) {
-            if ((tableCount % 2) == 0) {
-                gLayout.setRows(2);
-                gLayout.setColumns(3);
-            } else if ((tableCount % 1) == 0) {
-                gLayout.setRows(3);
-                gLayout.setColumns(3);
-            }
-        } else if (tableCount
-                > 10) {
-            if ((tableCount % 2) == 0) {
-                gLayout.setRows(4);
-                gLayout.setColumns(4);
-            } else if ((tableCount % 1) == 0) {
-                gLayout.setRows(5);
-                gLayout.setColumns(5);
-            }
-        } else {
-            System.out.println("error");
-            JOptionPane.showMessageDialog(null, "Error");
-            return;
-        }
+        GridLayout gLayout = new GridLayout(2, 3, 5, 5);
         jPanel1.setLayout(gLayout);
-        for (i = 0; i < tableCount; i++) {
-            jPaneltables[i] = new JPanel();
-            jPaneltables[i].setLayout(new BoxLayout(jPaneltables[i], BoxLayout.Y_AXIS));
-            jPanel1.add(jPaneltables[i]);
-        }
-        jPanel1.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jPanel1.setBackground(Color.BLUE);
+        for (int i = 0; i < size; i++) {
+            jpanel2[i] = new JPanel();
+            jLabeltableNum[i] = new JLabel("Table #" + (i + 1), SwingConstants.CENTER);
+            jLabelstatus[i] = new JLabel("", SwingConstants.CENTER);
 
+            jpanel2[i].setLayout(new BoxLayout(jpanel2[i], BoxLayout.Y_AXIS));
+
+            jLabeltableNum[i].setOpaque(true);
+            jLabeltableNum[i].setBackground(Color.YELLOW.brighter());
+            jLabeltableNum[i].setFont(new Font("Tahoma", Font.PLAIN, 26));
+            jLabeltableNum[i].setMaximumSize(new Dimension(getMaximumSize().width, getMinimumSize().height));
+
+            jLabelstatus[i].setOpaque(true);
+            jLabelstatus[i].setBackground(Color.LIGHT_GRAY);
+            jLabelstatus[i].setFont(new Font("Tahoma", Font.PLAIN, 30));
+            jLabelstatus[i].setMaximumSize(new Dimension(getMaximumSize().width, getMaximumSize().height));
+
+            jpanel2[i].add(jLabeltableNum[i]);
+            jpanel2[i].add(jLabelstatus[i]);
+
+            jPanel1.add(jpanel2[i]);
+        }
+//        jPanel1.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        clickedTable();
         threading();
 
-        for (x = 0; x < tableCount; x++) {
+        this.pack();
+    }
 
-            jPaneltables[x].addMouseListener(new MouseAdapter() {
+    private void threading() {
+        taskRunner.setTask(new Cashier.TaskOrder());
+        taskRunner.setDelay(5000);
+        taskRunner.run();
+    }
+
+    private class TaskOrder implements Task {
+
+        @Override
+        public void queTask() {
+            int i;
+            for (i = 0; i < jpanel2.length; i++) {
+                setTableStatus(i, jLabelstatus[i]);
+            }
+        }
+    }
+
+    private void setTableStatus(int index, JLabel labelStatus) {
+        List<Table> tablesList = cashierDao.getTableStatus();
+        if (tablesList.get(index).getStatus().equalsIgnoreCase("w")) {
+            labelStatus.setText("Waiting");
+            labelStatus.setBackground(Color.LIGHT_GRAY);
+        } else if (tablesList.get(index).getStatus().equalsIgnoreCase("o")) {
+            labelStatus.setText("Occupied");
+            labelStatus.setBackground(Color.GREEN);
+        } else if (tablesList.get(index).getStatus().equalsIgnoreCase("c")) {
+            labelStatus.setText("Check Out");
+            labelStatus.setBackground(Color.RED);
+        } else {
+            labelStatus.setBackground(Color.BLACK);
+        }
+        labelStatus.revalidate();
+    }
+
+    private void clickedTable() {
+        for (x = 0; x < jLabelstatus.length; x++) {
+            jpanel2[x].addMouseListener(new MouseAdapter() {
                 private int myIndex;
-                private int tableNumber;
-                // inner class
 
                 {
                     this.myIndex = x;
@@ -163,106 +168,15 @@ public class Cashier extends javax.swing.JFrame {
                 @Override
                 public void mouseClicked(MouseEvent me) {
                     super.mouseClicked(me); //To change body of generated methods, choose Tools | Templates.
-//                    JOptionPane.showMessageDialog(null, tables[myIndex].getName());
+//                    System.out.println("index: " + (myIndex + 1));
                     if (jLabelstatus[myIndex].getText().equalsIgnoreCase("Waiting") || jLabelstatus[myIndex].getText().equalsIgnoreCase("Occupied")) {
                         JOptionPane.showMessageDialog(null, "Not Check Out");
                     } else {
-                        callForm(a().get(myIndex).getTableNumber());
+                        callForm(myIndex + 1);
                     }
                 }
             });
         }
-
-        pack();
-    }
-
-    private class CashierTask implements Task {
-
-        @Override
-        public void queTask() {
-            setTableBackground(a());
-        }
-    }
-    private List<String> listStatus;
-    private List<Integer> listTableNumber;
-
-    private void setTableBackground(List<Table> status) {
-        jLabeltableNum = new JLabel[status.size()];
-        jLabelstatus = new JLabel[status.size()];
-        jLabelWaiting = new JLabel[status.size()];
-        listStatus = new ArrayList<>();
-        listTableNumber = new ArrayList<>();
-        for (x = 0; x < status.size(); x++) {
-
-            jLabelstatus[x] = new JLabel();
-            jLabelWaiting[x] = new JLabel();
-            listStatus.add(status.get(x).getStatus());
-            listTableNumber.add(status.get(x).getTableNumber());
-
-            SwingUtilities.invokeLater(new Runnable() {
-                private int _x;
-
-                {
-                    this._x = x;
-                }
-
-                @Override
-                public void run() {
-                    if (listStatus.get(_x).equalsIgnoreCase("W")) {
-                        jLabelstatus[_x].setText("Waiting");
-                        System.out.println("x: " + _x);
-                    }
-//                    jPaneltables[_x].remove(jLabelstatus[_x]);
-                    jPaneltables[_x].removeAll();
-                    if (listStatus.get(_x).equalsIgnoreCase("O")) {
-                        jPaneltables[_x].setBackground(Color.green);
-                        jlabelSettext(listStatus.get(_x), _x);
-                    } else if (listStatus.get(_x).equalsIgnoreCase("C")) {
-                        jPaneltables[_x].setBackground(Color.red);
-                        jlabelSettext(listStatus.get(_x), _x);
-                    } else if (listStatus.get(_x).equalsIgnoreCase("W")) {
-                        jPaneltables[_x].setBackground(Color.gray);
-                        jlabelSettext(listStatus.get(_x), _x);
-                    }
-                    
-                    jLabeltableNum[_x] = new JLabel();
-                    jLabeltableNum[_x].setFont(new Font("Tahoma", Font.PLAIN, 24));
-                    jLabeltableNum[_x].setText("#" + listTableNumber.get(_x));
-                    jLabeltableNum[_x].setAlignmentX(Component.CENTER_ALIGNMENT);
-                    jLabeltableNum[_x].revalidate();
-                    
-                    jLabelstatus[_x].setFont(new Font("Tahoma", Font.PLAIN, 24));
-                    jLabelstatus[_x].setAlignmentX(Component.CENTER_ALIGNMENT);
-
-                    jPaneltables[_x].add(jLabeltableNum[_x]);
-                    jPaneltables[_x].add(Box.createRigidArea(new Dimension(0, 30)));
-                    jPaneltables[_x].add(jLabelstatus[_x]);
-                }
-            });
-        }
-    }
-    private int y;
-    private String strStatus;
-
-    private void jlabelSettext(String status, int yy) {
-        this.y = yy;
-        if (status.equalsIgnoreCase("O")) {
-            strStatus = "Occupied";
-        } else if (status.equalsIgnoreCase("C")) {
-            strStatus = "Check Out";
-        } else if (status.equalsIgnoreCase("W")) {
-            System.out.println(status);
-            strStatus = "Waiting";
-        }
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-//                jLabelstatus[y].revalidate();
-                
-                jLabelstatus[y].setText(strStatus);
-                jLabelstatus[y].revalidate();
-            }
-        });
     }
 
     private void callForm(int tableNumber) {
@@ -271,6 +185,14 @@ public class Cashier extends javax.swing.JFrame {
         form.setLocationRelativeTo(null);
         form.setVisible(true);
         taskRunner.run();
+    }
+
+    private static void setSystemLookAndFeel() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -309,6 +231,7 @@ public class Cashier extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+                setSystemLookAndFeel();
                 new Cashier().setVisible(true);
             }
         });

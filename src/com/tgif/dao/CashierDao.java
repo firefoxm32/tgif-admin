@@ -11,7 +11,6 @@ import com.tgif.model.SideDish;
 import com.tgif.model.Table;
 import com.tgif.model.TransactionDetail;
 import com.tgif.model.TransactionHeader;
-import com.tgif.model.User;
 import com.tgif.util.Globals;
 import com.tgif.util.URLBuilder;
 import java.text.SimpleDateFormat;
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.swing.JOptionPane;
-import javax.swing.text.DateFormatter;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -102,7 +100,7 @@ public class CashierDao {
                 Double credit = object.getDouble("credit");
                 Double cash = object.getDouble("cash");
                 
-                int qty = object.getInt("qty");
+                int qty = object.getInt("quantity");
 
                 FoodItem foodItem = new FoodItem();
                 foodItem.setItemId(object.getInt("item_id"));
@@ -111,12 +109,12 @@ public class CashierDao {
                 Serving serving = new Serving();
                 serving.setServingId(object.getInt("serving_id"));
                 serving.setServingName(object.getString("serving_name"));
-                serving.setAbbreviation(object.getString("fs_abbreviation"));
+                serving.setAbbreviation(object.getString("serving_code"));
 
                 SideDish sideDish = new SideDish();
                 sideDish.setSideDishId(object.getInt("side_dish_id"));
                 sideDish.setSideDishName(String.valueOf(object.get("side_dish_name")));
-                sideDish.setAbbreviation(String.valueOf(object.get("sd_abbreviation")));
+                sideDish.setAbbreviation(String.valueOf(object.get("side_dish_code")));
 
                 List<Sauce> sauces = new ArrayList<>();
                 JSONArray arrSauce = object.getJSONArray("sauces");
@@ -125,7 +123,7 @@ public class CashierDao {
                     Sauce sauce = new Sauce();
                     sauce.setSauceId(objSauce.getInt("sauce_id"));
                     sauce.setSauceName(objSauce.getString("sauce_name"));
-                    sauce.setAbbreviation(objSauce.getString("s_abbreviation"));
+                    sauce.setAbbreviation(objSauce.getString("sauce_code"));
                     sauces.add(sauce);
                 }
 
