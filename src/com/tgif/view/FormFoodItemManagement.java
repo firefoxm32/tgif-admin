@@ -22,10 +22,10 @@ import org.jdesktop.xswingx.PromptSupport;
  */
 public class FormFoodItemManagement extends javax.swing.JInternalFrame {
 
-    private String[] header = {"Item Id", "Category Name", "Item Name", "Image", "Description", "Promo Price", "Promo Status"};
+    private String[] header = {"Item Id", "Category Name", "Item Name", "Image", "Description", "Item Status", "Promo Status"};
     private boolean[] cellEditable = {false, false, false, false, false, false, false};
     private int[] width = {100, 150, 150, 150, 500, 100, 100};
-    private String[] fields = {"", "item_id", "label", "menu_name", "image"};
+    private String[] fields = {"", "item_id", "menu_name", "item_name"};
 
     /**
      * Creates new form FormSupplierManagement
@@ -35,6 +35,7 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
         initTextField();
         initTable();
         jLabelSpinner.setVisible(false);
+        jButtonPromo.setVisible(false);
     }
 
     private void initTextField() {
@@ -44,21 +45,21 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
     }
 
     private void initTable() {
-        TableManager.setModel(jXTableSuppliers, jScrollPaneSuppliers, null, header, false, false, 0, cellEditable, width);
+        TableManager.setModel(jXTableFoodItem, jScrollPane1, null, header, false, false, 0, cellEditable, width);
         getfoodItem("", "");
     }
 
     private void getfoodItem(String field, String value) {
-        TableManager.getTableModel(jXTableSuppliers).setRowCount(0);
+        TableManager.getTableModel(jXTableFoodItem).setRowCount(0);
         FoodItemsDao foodItemsDao = new FoodItemsDao();
         for (FoodItem foodItem : foodItemsDao.getFoodItems(field, value)) {
-            TableManager.getTableModel(jXTableSuppliers).addRow(new Object[]{
+            TableManager.getTableModel(jXTableFoodItem).addRow(new Object[]{
                 foodItem.getItemId(),
                 foodItem.getCategory().getName(),
                 foodItem.getItemName(),
                 foodItem.getImage(),
                 foodItem.getDescription(),
-                foodItem.getPromoPrice(),
+                foodItem.getStatus(),
                 foodItem.getPromoStatus()
             });
         }
@@ -80,8 +81,8 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
         jButtonEdit = new javax.swing.JButton();
         jButtonDelete = new javax.swing.JButton();
         jButtonPromo = new javax.swing.JButton();
-        jScrollPaneSuppliers = new javax.swing.JScrollPane();
-        jXTableSuppliers = new org.jdesktop.swingx.JXTable();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jXTableFoodItem = new org.jdesktop.swingx.JXTable();
         jTextFieldSearch = new javax.swing.JTextField();
         jButtonSearch = new javax.swing.JButton();
         jLabelSpinner = new javax.swing.JLabel();
@@ -141,9 +142,9 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 370, 510, -1));
 
-        jScrollPaneSuppliers.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
-        jXTableSuppliers.setModel(new javax.swing.table.DefaultTableModel(
+        jXTableFoodItem.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -151,9 +152,9 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
 
             }
         ));
-        jScrollPaneSuppliers.setViewportView(jXTableSuppliers);
+        jScrollPane1.setViewportView(jXTableFoodItem);
 
-        jPanel1.add(jScrollPaneSuppliers, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 670, 310));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 670, 310));
 
         jTextFieldSearch.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jTextFieldSearch.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -176,7 +177,7 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
         jPanel1.add(jLabelSpinner, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 370, 150, -1));
 
         jComboBoxField.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jComboBoxField.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select Field", "Item Id", "Category Name", "Item Name", "Image" }));
+        jComboBoxField.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select Field", "Item Id", "Category Name", "Item Name" }));
         jComboBoxField.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jComboBoxFieldItemStateChanged(evt);
@@ -206,6 +207,7 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
 
     private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchActionPerformed
         if (jComboBoxField.getSelectedIndex() > 0) {
+            System.out.println("FIELDS: "+ fields[jComboBoxField.getSelectedIndex()] + " " + jTextFieldSearch.getText());
             getfoodItem(fields[jComboBoxField.getSelectedIndex()], jTextFieldSearch.getText());
         } else {
             JOptionPane.showMessageDialog(this, "Please select field");
@@ -215,8 +217,8 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
 
     private void jButtonNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNewActionPerformed
         List<String> itemNames = new ArrayList<>();
-        for(int i = 0; i < jXTableSuppliers.getRowCount(); i++) {
-            itemNames.add(jXTableSuppliers.getValueAt(i, 2).toString().toLowerCase());
+        for(int i = 0; i < jXTableFoodItem.getRowCount(); i++) {
+            itemNames.add(jXTableFoodItem.getValueAt(i, 2).toString().toLowerCase());
         }
         FormFoodItem form = new FormFoodItem(Main.JFParent, true);
         form.setTitle("Add Food Item");
@@ -234,22 +236,24 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
 
     private void jButtonEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEditActionPerformed
         List<String> itemNames = new ArrayList<>();
-        for(int i = 0; i < jXTableSuppliers.getRowCount(); i++) {
-            itemNames.add(jXTableSuppliers.getValueAt(i, 2).toString().toLowerCase());
+        for(int i = 0; i < jXTableFoodItem.getRowCount(); i++) {
+            itemNames.add(jXTableFoodItem.getValueAt(i, 2).toString().toLowerCase());
         }
-        if (jXTableSuppliers.getSelectedRow() >= 0) {
-            int itemId = Integer.valueOf(jXTableSuppliers.getValueAt(jXTableSuppliers.getSelectedRow(), 0).toString());
-            String categoryName = jXTableSuppliers.getValueAt(jXTableSuppliers.getSelectedRow(), 1).toString();
-            String itemName = jXTableSuppliers.getValueAt(jXTableSuppliers.getSelectedRow(), 2).toString();
-            String image = jXTableSuppliers.getValueAt(jXTableSuppliers.getSelectedRow(), 3).toString();
-            String description = jXTableSuppliers.getValueAt(jXTableSuppliers.getSelectedRow(), 4).toString();
-
+        if (jXTableFoodItem.getSelectedRow() >= 0) {
+            int itemId = Integer.valueOf(jXTableFoodItem.getValueAt(jXTableFoodItem.getSelectedRow(), 0).toString());
+            String categoryName = jXTableFoodItem.getValueAt(jXTableFoodItem.getSelectedRow(), 1).toString();
+            String itemName = jXTableFoodItem.getValueAt(jXTableFoodItem.getSelectedRow(), 2).toString();
+            String image = jXTableFoodItem.getValueAt(jXTableFoodItem.getSelectedRow(), 3).toString();
+            String description = jXTableFoodItem.getValueAt(jXTableFoodItem.getSelectedRow(), 4).toString();
+            String promoStatus = jXTableFoodItem.getValueAt(jXTableFoodItem.getSelectedRow(), 6).toString();
+            System.out.println("Promo status: "+promoStatus);
             FoodItem foodItem = new FoodItem();
             Category category = new Category();
             category.setName(categoryName);
             foodItem.setItemId(itemId);
             foodItem.setItemName(itemName);
             foodItem.setImage(image);
+            foodItem.setPromoStatus(promoStatus);
             foodItem.setDescription(description);
             foodItem.setCategory(category);
 
@@ -269,8 +273,8 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jButtonEditActionPerformed
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
-        if (jXTableSuppliers.getSelectedRow() >= 0) {
-            int id = Integer.valueOf(TableManager.getTableModel(jXTableSuppliers).getValueAt(jXTableSuppliers.getSelectedRow(), 0).toString());
+        if (jXTableFoodItem.getSelectedRow() >= 0) {
+            int id = Integer.valueOf(TableManager.getTableModel(jXTableFoodItem).getValueAt(jXTableFoodItem.getSelectedRow(), 0).toString());
             FoodItem foodItem = new FoodItem();
             foodItem.setItemId(id);
             FoodItemsDao foodItemsDao = new FoodItemsDao();
@@ -289,17 +293,15 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jComboBoxFieldItemStateChanged
 
     private void jButtonPromoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPromoActionPerformed
-        System.out.println(jXTableSuppliers.getSelectedRow());
-        if (jXTableSuppliers.getSelectedRow() >= 0) {
-            int id = Integer.valueOf(TableManager.getTableModel(jXTableSuppliers).getValueAt(jXTableSuppliers.getSelectedRow(), 0).toString());
-            String itemName = TableManager.getTableModel(jXTableSuppliers).getValueAt(jXTableSuppliers.getSelectedRow(), 2).toString();
-            String promoStatus = TableManager.getTableModel(jXTableSuppliers).getValueAt(jXTableSuppliers.getSelectedRow(), 6).toString();
-            Double promoPrice = Double.valueOf(TableManager.getTableModel(jXTableSuppliers).getValueAt(jXTableSuppliers.getSelectedRow(), 5).toString());
-
+        System.out.println(jXTableFoodItem.getSelectedRow());
+        if (jXTableFoodItem.getSelectedRow() >= 0) {
+            int id = Integer.valueOf(TableManager.getTableModel(jXTableFoodItem).getValueAt(jXTableFoodItem.getSelectedRow(), 0).toString());
+            String itemName = TableManager.getTableModel(jXTableFoodItem).getValueAt(jXTableFoodItem.getSelectedRow(), 2).toString();
+            String promoStatus = TableManager.getTableModel(jXTableFoodItem).getValueAt(jXTableFoodItem.getSelectedRow(), 6).toString();
+            
             FoodItem foodItem = new FoodItem();
             foodItem.setItemId(id);
             foodItem.setItemName(itemName);
-            foodItem.setPromoPrice(promoPrice);
             foodItem.setPromoStatus(promoStatus);
             FormPromo formPromo = new FormPromo(Main.JFParent, true);
             formPromo.setTitle("Add/Edit Promo");
@@ -323,8 +325,8 @@ public class FormFoodItemManagement extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabelSpinner;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPaneSuppliers;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextFieldSearch;
-    private org.jdesktop.swingx.JXTable jXTableSuppliers;
+    private org.jdesktop.swingx.JXTable jXTableFoodItem;
     // End of variables declaration//GEN-END:variables
 }

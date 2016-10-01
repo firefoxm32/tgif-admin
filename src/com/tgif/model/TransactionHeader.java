@@ -11,11 +11,39 @@ import java.util.Date;
  * @author Mon
  */
 public class TransactionHeader {
+
     private String transactionId;
     private int tableNumber;
     private Date transactionDate;
     private String cashierId; //username
     private Double cashAmount;
+    private Double seniorDiscount;
+    private Double memberDiscount;
+    private String memberId;
+
+    public String getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(String memberId) {
+        this.memberId = memberId;
+    }
+
+    public Double getSeniorDiscount() {
+        return seniorDiscount;
+    }
+
+    public void setSeniorDiscount(Double seniorDiscount) {
+        this.seniorDiscount = seniorDiscount;
+    }
+
+    public Double getMemberDiscount() {
+        return memberDiscount;
+    }
+
+    public void setMemberDiscount(Double memberDiscount) {
+        this.memberDiscount = memberDiscount;
+    }
 
     public String getTransactionId() {
         return transactionId;

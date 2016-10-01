@@ -10,6 +10,7 @@ import com.tgif.model.TransactionDetail;
 import com.tgif.model.TransactionHeader;
 import com.tgif.util.TableManager;
 import java.awt.Font;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import javax.swing.JOptionPane;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -30,6 +31,7 @@ public class FormTransactionDetail extends javax.swing.JDialog {
     private int[] width = {578, 100, 100};
     JasperReport jasperReport;
     JasperPrint jasperPrint;
+
     /**
      * Creates new form FormTransactionDetail
      */
@@ -44,41 +46,74 @@ public class FormTransactionDetail extends javax.swing.JDialog {
 
     private void initTable() {
         TableManager.setModel(jTableTransactionDetails, jScrollPane1, null, header, false, false, 0, cellEditable, width);
-        jTableTransactionDetails.setFont(new Font("Tahoma", Font.PLAIN, 16));
+        jTableTransactionDetails.setFont(new Font("Tahoma", Font.PLAIN, 12));
         jTableTransactionDetails.setRowHeight(jTableTransactionDetails.getRowHeight() * 2);
         getTransactionDetails();
     }
+    private double cashAmount;
+    private double subTotal;
+    private double seniorDiscount;
+    private String memberId;
 
     private void getTransactionDetails() {
-        Double credit = 0.0;
-        Double cash = 0.0;
+        double credit = 0.0;
+        double cash = 0.0;
         CashierDao cashierDao = new CashierDao();
         TableManager.getTableModel(jTableTransactionDetails).setRowCount(0);
         for (TransactionDetail detail : cashierDao.getTransactionDetails(Integer.valueOf(jLabelTableNumber.getText()))) {
-            System.out.println("here");
             jTextFieldTransactionId.setText(detail.getTransactionId());
             String sauce = "";
             credit = detail.getCredit();
             cash = detail.getCash();
+            memberId = detail.getMemberId();
             for (int i = 0; i < detail.getSauce().size(); i++) {
-                sauce = detail.getSauce().get(i).getAbbreviation() + ", ";
+                sauce += detail.getSauce().get(i).getSauceName() + ", ";
             }
-            String sauces="";
+            String sauces = "";
             if (!sauce.isEmpty()) {
                 sauces = sauce.substring(0, sauce.length() - 2);
             }
-            String details = detail.getFoodItem().getItemName() + ", Serving: (" + detail.getServing().getAbbreviation() + "), "
-                    + "Sauce/s: (" + sauces + "), Side Dish: (" + detail.getSideDish().getAbbreviation() + ")";
+            String sideDish = "";
+            if (!detail.getSideDish().getSideDishName().toString().equalsIgnoreCase("null")) {
+                sideDish = detail.getSideDish().getSideDishName();
+            }
+
+            String details = detail.getFoodItem().getItemName() + ", Serving: ( " + detail.getServing().getServingName() + " ), "
+                    + "Sauce/s: ( " + sauces + " ), Side Dish: ( " + sideDish + " )";
             TableManager.getTableModel(jTableTransactionDetails).addRow(new Object[]{
                 details,
                 detail.getPrice(),
                 detail.getQuantity()
             });
         }
-        jLabelCash.setText(String.valueOf(cash));
-        jLabelTotal.setText(String.valueOf(credit));
-        Double change = cash - credit;
-        jLabelChange.setText(String.valueOf(change));
+        cashAmount = cash;
+        subTotal = credit;
+        payments(0);
+    }
+    private double memberDiscount;
+    private double serviceCharge;
+    private double total;
+    private double change;
+
+    private void payments(double sDiscount) {
+        DecimalFormat formatter = new DecimalFormat("#,##0.00");
+        jLabelSubTotal.setText(formatter.format(subTotal));
+        if (!memberId.equalsIgnoreCase("null")) {
+            memberDiscount = subTotal * .20;
+        }
+
+
+        serviceCharge = subTotal * .03;
+
+        jLabelMembershipDiscount.setText(formatter.format(memberDiscount * -1));
+        jLabelSeniorDiscount.setText(formatter.format(sDiscount * -1));
+        jLabelServiceCharge.setText(formatter.format(serviceCharge));
+
+        total = subTotal + serviceCharge - memberDiscount - sDiscount;
+        jLabelTotal.setText(formatter.format(total));
+        jLabelCash.setText(formatter.format(cashAmount));
+        change = cashAmount - total;
+        jLabelChange.setText(formatter.format(change));
     }
 
     /**
@@ -98,14 +133,23 @@ public class FormTransactionDetail extends javax.swing.JDialog {
         jLabel3 = new javax.swing.JLabel();
         jLabelCash = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jLabelTotal = new javax.swing.JLabel();
+        jLabelSubTotal = new javax.swing.JLabel();
         jButtonCheckOut = new javax.swing.JButton();
         jButtonClose = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         jLabelTableNumber = new javax.swing.JLabel();
         jTextFieldTransactionId = new javax.swing.JTextField();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        jLabelSeniorDiscount = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabelMembershipDiscount = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabelServiceCharge = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabelTotal = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setPreferredSize(new java.awt.Dimension(1040, 488));
         setResizable(false);
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -120,31 +164,34 @@ public class FormTransactionDetail extends javax.swing.JDialog {
         ));
         jScrollPane1.setViewportView(jTableTransactionDetails);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 10, 780, 350));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 10, 780, 390));
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         jLabel1.setText("Cash Amount:");
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 150, -1, -1));
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 250, 130, 30));
 
         jLabelChange.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabelChange.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabelChange.setText("0.00");
-        jPanel1.add(jLabelChange, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 250, -1, -1));
+        jPanel1.add(jLabelChange, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 290, 90, 30));
 
-        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         jLabel3.setText("Change:");
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 220, -1, -1));
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 290, 130, 30));
 
         jLabelCash.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabelCash.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabelCash.setText("0.00");
-        jPanel1.add(jLabelCash, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, -1, -1));
+        jPanel1.add(jLabelCash, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 250, 90, 30));
 
-        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel5.setText("Total:");
-        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 90, -1));
+        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        jLabel5.setText("Sub Total Bill:");
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 130, 30));
 
-        jLabelTotal.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jLabelTotal.setText("0.00");
-        jPanel1.add(jLabelTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, -1, -1));
+        jLabelSubTotal.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabelSubTotal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabelSubTotal.setText("0.00");
+        jPanel1.add(jLabelSubTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 50, 90, 30));
 
         jButtonCheckOut.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jButtonCheckOut.setText("Check Out");
@@ -153,7 +200,7 @@ public class FormTransactionDetail extends javax.swing.JDialog {
                 jButtonCheckOutActionPerformed(evt);
             }
         });
-        jPanel1.add(jButtonCheckOut, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 300, 140, 60));
+        jPanel1.add(jButtonCheckOut, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 340, 230, 60));
 
         jButtonClose.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jButtonClose.setText("Close");
@@ -162,28 +209,68 @@ public class FormTransactionDetail extends javax.swing.JDialog {
                 jButtonCloseActionPerformed(evt);
             }
         });
-        jPanel1.add(jButtonClose, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 370, 110, 40));
+        jPanel1.add(jButtonClose, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 410, 110, 40));
 
-        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         jLabel6.setText("Table Number:");
-        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, -1, -1));
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 130, 30));
 
         jLabelTableNumber.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabelTableNumber.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabelTableNumber.setText("0");
-        jPanel1.add(jLabelTableNumber, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, -1, -1));
-        jPanel1.add(jTextFieldTransactionId, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 370, 140, -1));
+        jPanel1.add(jLabelTableNumber, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 10, 90, 30));
+        jPanel1.add(jTextFieldTransactionId, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 410, 140, -1));
+
+        jCheckBox1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jCheckBox1.setText("Senior Discount");
+        jCheckBox1.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jCheckBox1ItemStateChanged(evt);
+            }
+        });
+        jPanel1.add(jCheckBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, 130, 30));
+
+        jLabelSeniorDiscount.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabelSeniorDiscount.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabelSeniorDiscount.setText("0.00");
+        jPanel1.add(jLabelSeniorDiscount, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 130, 90, 30));
+
+        jLabel7.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        jLabel7.setText("Member Discount:");
+        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 130, 30));
+
+        jLabelMembershipDiscount.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabelMembershipDiscount.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabelMembershipDiscount.setText("0.00");
+        jPanel1.add(jLabelMembershipDiscount, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 170, 90, 30));
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        jLabel2.setText("Service Charge:");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 90, 130, 30));
+
+        jLabelServiceCharge.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabelServiceCharge.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabelServiceCharge.setText("0.00");
+        jPanel1.add(jLabelServiceCharge, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 90, 90, 30));
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        jLabel4.setText("Total Bill:");
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 210, 130, 30));
+
+        jLabelTotal.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabelTotal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabelTotal.setText("0.00");
+        jPanel1.add(jLabelTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 210, 90, 30));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 950, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1040, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 419, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 460, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -200,29 +287,46 @@ public class FormTransactionDetail extends javax.swing.JDialog {
 //            JOptionPane.showMessageDialog(this, "Cancel");
             return;
         }
-        printReport();
+        String seniorCitizenStatus;
+        if (jCheckBox1.isSelected()) {
+            seniorCitizenStatus = "senior";
+        } else {
+            seniorCitizenStatus = "not senior";
+        }
         TransactionHeader transactionHeader = new TransactionHeader();
         transactionHeader.setTransactionId(jTextFieldTransactionId.getText());
-        transactionHeader.setCashAmount(Double.valueOf(jLabelCash.getText()));
+        transactionHeader.setCashAmount(cashAmount);
         transactionHeader.setTableNumber(Integer.valueOf(jLabelTableNumber.getText()));
+        transactionHeader.setSeniorDiscount(seniorDiscount);
         transactionHeader.setCashierId("cashier1"); // username = id
+
         if (!transactionHeader.getTransactionId().equalsIgnoreCase("")) {
             cashierDao.save(transactionHeader);
+            printReport(seniorCitizenStatus);
             this.dispose();
         } else {
-            System.out.println("transaction_header: "+transactionHeader);
+            System.out.println("transaction_header: " + transactionHeader);
             System.out.println("null");
         }
     }//GEN-LAST:event_jButtonCheckOutActionPerformed
-     private void printReport() {
+
+    private void jCheckBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox1ItemStateChanged
+        if (jCheckBox1.isSelected()) {
+            seniorDiscount = subTotal * .20;
+            payments(seniorDiscount);
+        } else {
+            seniorDiscount = 0;
+            payments(seniorDiscount);
+        }
+    }//GEN-LAST:event_jCheckBox1ItemStateChanged
+    private void printReport(String status) {
 
         try {
 
             HashMap map = new HashMap();
 
-      
             map.put("transaction_id", jTextFieldTransactionId.getText().trim());
-            
+            map.put("senior_status", status);
             System.out.println(map);
             String path = "/report/tgif_recipe.jasper";
 
@@ -232,35 +336,42 @@ public class FormTransactionDetail extends javax.swing.JDialog {
             e.printStackTrace();
         }
     }
-    public void print(HashMap params, String reportPath){
+
+    public void print(HashMap params, String reportPath) {
         try {
-             // System.out.println(params);
-                    //JasperReport jasperReport = (JasperReport)JRLoader.loadObject(getClass().getResource("/sample_report/sample_print.jasper"));
-                   jasperReport = (JasperReport) JRLoader.loadObject(getClass().getResource(reportPath));
-                              
-                   // JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params , db.connect());
-                   DBConnection db = new DBConnection();
-                   jasperPrint = JasperFillManager.fillReport(jasperReport, params, db.connect());
-                   JasperViewer.viewReport(jasperPrint, false);
-        }
-        catch (Exception e) {
+            // System.out.println(params);
+            //JasperReport jasperReport = (JasperReport)JRLoader.loadObject(getClass().getResource("/sample_report/sample_print.jasper"));
+            jasperReport = (JasperReport) JRLoader.loadObject(getClass().getResource(reportPath));
+
+            // JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params , db.connect());
+            DBConnection db = new DBConnection();
+            jasperPrint = JasperFillManager.fillReport(jasperReport, params, db.connect());
+            JasperViewer.viewReport(jasperPrint, true);
+        } catch (Exception e) {
 //            MessageDialog.show(CustomerService.JFParent, e);
             e.printStackTrace();
         }
     }
-    
     /**
      * @param args the command line arguments
      */
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonCheckOut;
     private javax.swing.JButton jButtonClose;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabelCash;
     private javax.swing.JLabel jLabelChange;
+    private javax.swing.JLabel jLabelMembershipDiscount;
+    private javax.swing.JLabel jLabelSeniorDiscount;
+    private javax.swing.JLabel jLabelServiceCharge;
+    private javax.swing.JLabel jLabelSubTotal;
     private javax.swing.JLabel jLabelTableNumber;
     private javax.swing.JLabel jLabelTotal;
     private javax.swing.JPanel jPanel1;

@@ -25,7 +25,16 @@ public class TransactionDetail {
     private Double credit;
     private Double debit;
     private Double cash;
+    private String memberId;
 
+    public String getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(String memberId) {
+        this.memberId = memberId;
+    }
+    
     public Double getCash() {
         return cash;
     }

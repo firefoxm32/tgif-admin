@@ -35,7 +35,7 @@ import javax.swing.UIManager;
  */
 public class ServingApp extends javax.swing.JFrame {
     public static Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    private String[] header = {"id", "Item Description", "Qty"};
+    private String[] header = {"ID", "Item Description", "Qty"};
     private boolean[] cellEditable = {false, false, false};
     private int[] width = {40, 338, 72};
     /**
@@ -123,7 +123,7 @@ public class ServingApp extends javax.swing.JFrame {
                 getOrders(String.valueOf(x), jTables[i]);
             }
         }
-    }
+    } 
 
     private void getOrders(String tableNumber, JTable table) {
         System.out.println("here");

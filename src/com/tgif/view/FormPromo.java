@@ -34,7 +34,6 @@ public class FormPromo extends javax.swing.JDialog {
             if (this.foodItem.getPromoStatus().equalsIgnoreCase("A")) {
                 jTextFieldItemId.setText(String.valueOf(this.foodItem.getItemId()));
                 jTextFieldName.setText(this.foodItem.getItemName());
-                jTextFieldPromoPrice.setText(String.valueOf(this.foodItem.getPromoPrice()));
                 jRadioButtonActive.setSelected(true);
             } else {
                 jTextFieldItemId.setText(String.valueOf(this.foodItem.getItemId()));
@@ -175,7 +174,6 @@ public class FormPromo extends javax.swing.JDialog {
         FoodItemsDao foodItemsDao = new FoodItemsDao();
         FoodItem localFoodItem = new FoodItem();
         localFoodItem.setItemId(Integer.valueOf(jTextFieldItemId.getText()));
-        localFoodItem.setPromoPrice(Double.valueOf(jTextFieldPromoPrice.getText()));
         String status = jRadioButtonActive.isSelected() ? "A" : "I";
         localFoodItem.setPromoStatus(status);
         foodItemsDao.addEditPromo(localFoodItem);

@@ -99,6 +99,7 @@ public class CashierDao {
                 Double price = object.getDouble("price");
                 Double credit = object.getDouble("credit");
                 Double cash = object.getDouble("cash");
+                String memberId = object.get("member_id").toString();
                 
                 int qty = object.getInt("quantity");
 
@@ -139,6 +140,7 @@ public class CashierDao {
                 transactionDetail.setServing(serving);
                 transactionDetail.setSideDish(sideDish);
                 transactionDetail.setSauce(sauces);
+                transactionDetail.setMemberId(memberId);
                 list.add(transactionDetail);
             }
         } catch (Exception e) {
@@ -158,6 +160,7 @@ public class CashierDao {
                 .add("transaction_id", transactionHeader.getTransactionId())
                 .add("table_number", String.valueOf(transactionHeader.getTableNumber()))
                 .add("cash_amount", String.valueOf(transactionHeader.getCashAmount()))
+                .add("senior_citizen", String.valueOf(transactionHeader.getSeniorDiscount()))
                 .build();
         //build url
         String url = new URLBuilder()

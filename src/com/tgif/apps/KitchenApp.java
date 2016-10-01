@@ -31,10 +31,12 @@ import javax.swing.UIManager;
  * @author Mon
  */
 public class KitchenApp extends javax.swing.JFrame {
+
     public static Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
     private String[] header = {"ID", "Item Description", "Qty"};
     private boolean[] cellEditable = {false, false, false};
     private int[] width = {35, 353, 62};
+
     /**
      * Creates new form KitchenApp
      */
@@ -43,7 +45,6 @@ public class KitchenApp extends javax.swing.JFrame {
         setExtendedState(MAXIMIZED_BOTH);
         gridLayout();
     }
-    
     protected JPanel[] jpanel2;
     protected JTable[] jTables;
     protected JLabel[] jLabels;
@@ -76,9 +77,9 @@ public class KitchenApp extends javax.swing.JFrame {
             jLabels[i].setFont(new Font("Tahoma", Font.BOLD, 26));
             jLabels[i].setBackground(Color.YELLOW);
             jLabels[i].setMaximumSize(new Dimension(getMaximumSize().width, getMinimumSize().height));
-            
+
             TableManager.setModel(jTables[i], jScrollPanes[i], null, header, false, false, 0, cellEditable, width);
-            
+
             jTables[i].setGridColor(Color.BLACK);
             jTables[i].setAlignmentX(CENTER_ALIGNMENT);
             jTables[i].setFont(new Font("Tahoma", Font.PLAIN, 22));
@@ -104,6 +105,7 @@ public class KitchenApp extends javax.swing.JFrame {
     }
 
     private class TaskOrder implements Task {
+
         @Override
         public void queTask() {
             for (int i = 0; i < jTables.length; i++) {
@@ -113,7 +115,9 @@ public class KitchenApp extends javax.swing.JFrame {
         }
     }
     protected JTextArea jTextArea;
+
     private void getOrders(String tableNumber, JTable table) {
+        TableManager.getTableModel(table).setNumRows(0);
         jTextArea = new JTextArea();
         jTextArea.setLineWrap(true);
         ServeDao serveDao = new ServeDao();
@@ -132,13 +136,13 @@ public class KitchenApp extends javax.swing.JFrame {
                     + ", Sauce/s: " + subSauces
                     + ", Side Dish: " + orderDetail.get(x).getSideDish().getAbbreviation();
 //            jTextArea.setText(description);
-            if (!isDataExist(orderDetail.get(x).getId(), table)) {
-                TableManager.getTableModel(table).addRow(new Object[]{
-                    orderDetail.get(x).getId(),
-                    description,
-                    orderDetail.get(x).getQty()
-                });
-            }
+//            if (!isDataExist(orderDetail.get(x).getId(), table)) {
+            TableManager.getTableModel(table).addRow(new Object[]{
+                orderDetail.get(x).getId(),
+                description,
+                orderDetail.get(x).getQty()
+            });
+//            }
         }
     }
 
@@ -150,6 +154,7 @@ public class KitchenApp extends javax.swing.JFrame {
         }
         return false;
     }
+
     private static void setSystemLookAndFeel() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -157,7 +162,7 @@ public class KitchenApp extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

@@ -3,6 +3,7 @@ package com.tgif.apps;
 import com.tgif.util.Formatter;
 import com.tgif.view.FormCategoryManagement;
 import com.tgif.view.FormFoodItemManagement;
+import com.tgif.view.FormMemberShipManagement;
 import com.tgif.view.FormUserManagement;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -47,6 +48,8 @@ public class Main extends javax.swing.JFrame {
         jSeparator6 = new javax.swing.JToolBar.Separator();
         jButtonFoodManagement = new javax.swing.JButton();
         jSeparator7 = new javax.swing.JToolBar.Separator();
+        jButtonMembership = new javax.swing.JButton();
+        jSeparator8 = new javax.swing.JToolBar.Separator();
         jButtonUserManagement = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -96,6 +99,19 @@ public class Main extends javax.swing.JFrame {
         jToolBar2.add(jButtonFoodManagement);
         jToolBar2.add(jSeparator7);
 
+        jButtonMembership.setText("Membership");
+        jButtonMembership.setToolTipText("Users");
+        jButtonMembership.setFocusable(false);
+        jButtonMembership.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonMembership.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButtonMembership.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonMembershipActionPerformed(evt);
+            }
+        });
+        jToolBar2.add(jButtonMembership);
+        jToolBar2.add(jSeparator8);
+
         jButtonUserManagement.setText("Users");
         jButtonUserManagement.setToolTipText("Users");
         jButtonUserManagement.setFocusable(false);
@@ -140,6 +156,10 @@ public class Main extends javax.swing.JFrame {
     private void jButtonUserManagementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUserManagementActionPerformed
         iframeRequest = showWindow(iframeRequest, new FormUserManagement());
     }//GEN-LAST:event_jButtonUserManagementActionPerformed
+
+    private void jButtonMembershipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonMembershipActionPerformed
+        iframeRequest = showWindow(iframeRequest, new FormMemberShipManagement());
+    }//GEN-LAST:event_jButtonMembershipActionPerformed
 
     private void initializeStatusBar() {
         Date sysDate = new Date();
@@ -230,6 +250,7 @@ public class Main extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonCategoryManagement;
     private javax.swing.JButton jButtonFoodManagement;
+    private javax.swing.JButton jButtonMembership;
     private javax.swing.JButton jButtonUserManagement;
     private javax.swing.JLabel jLabelDivision;
     private javax.swing.JLabel jLabelIpAddress;
@@ -239,6 +260,7 @@ public class Main extends javax.swing.JFrame {
     private static javax.swing.JDesktopPane jMainDesktop;
     private javax.swing.JToolBar.Separator jSeparator6;
     private javax.swing.JToolBar.Separator jSeparator7;
+    private javax.swing.JToolBar.Separator jSeparator8;
     private javax.swing.JToolBar jToolBar2;
     private org.jdesktop.swingx.JXStatusBar jXStatusBar1;
     // End of variables declaration//GEN-END:variables

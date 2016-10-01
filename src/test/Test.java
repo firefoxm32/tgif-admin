@@ -10,7 +10,11 @@ package test;
  */
 public class Test {
     public static void main(String[] args) {
-       new Test().a();
+//       new Test().a();   
+        
+        String ip = "19123";
+        System.out.println(NewClass.http+ip+NewClass.FOO);
+        
     }
     public int a() { 
         

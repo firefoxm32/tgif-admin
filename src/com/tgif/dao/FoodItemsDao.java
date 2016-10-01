@@ -65,9 +65,8 @@ public class FoodItemsDao {
                     String categoryName = object.getString("menu_name");
                     String foodItemName = object.getString("item_name");
                     String image = object.getString("image");
-//                    String description = object.getString("description");
+                    String itemStatus = object.getString("status");
                     String description = String.valueOf(object.get("description"));
-                    Double promoPrice = object.getDouble("promo_price");
                     String promoStatus = object.getString("promo_status");
                     
                     FoodItem foodItem = new FoodItem();
@@ -79,9 +78,9 @@ public class FoodItemsDao {
                     foodItem.setItemId(itemId);
                     foodItem.setItemName(foodItemName);
                     foodItem.setImage(image);
+                    foodItem.setStatus(itemStatus);
                     foodItem.setDescription(description);
                     foodItem.setCategory(category);
-                    foodItem.setPromoPrice(promoPrice);
                     foodItem.setPromoStatus(promoStatus);
 
                     list.add(foodItem);
@@ -229,7 +228,7 @@ public class FoodItemsDao {
                         serving.setServingId(jsonServing.getInt("serving_id"));
                         serving.setServingName(jsonServing.getString("serving_name"));
                         serving.setPrice(jsonServing.getDouble("price"));
-                        serving.setAbbreviation(jsonServing.getString("fs_abbreviation"));
+                        serving.setAbbreviation(jsonServing.getString("serving_code"));
                         servings.add(serving);
                     }
                 }
@@ -242,7 +241,7 @@ public class FoodItemsDao {
                         Sauce sauce = new Sauce();
                         sauce.setSauceId(jsonSauce.getInt("sauce_id"));
                         sauce.setSauceName(jsonSauce.getString("sauce_name"));
-                        sauce.setAbbreviation(jsonSauce.getString("s_abbreviation"));
+                        sauce.setAbbreviation(jsonSauce.getString("sauce_code"));
                         sauces.add(sauce);
                     }
                 }
@@ -254,7 +253,7 @@ public class FoodItemsDao {
                         SideDish sideDish = new SideDish();
                         sideDish.setSideDishId(jsonSideDish.getInt("side_dish_id"));
                         sideDish.setSideDishName(jsonSideDish.getString("side_dish_name"));
-                        sideDish.setAbbreviation(jsonSideDish.getString("sd_abbreviation"));
+                        sideDish.setAbbreviation(jsonSideDish.getString("side_dish_code"));
                         sideDishes.add(sideDish);
                     }
                 }
@@ -272,7 +271,7 @@ public class FoodItemsDao {
     public void addEditPromo(FoodItem foodItem) {
         RequestBody body = new FormBody.Builder()
                 .add("item_id", String.valueOf(foodItem.getItemId()))
-                .add("promo_price", String.valueOf(foodItem.getPromoPrice()))
+//                .add("promo_price", String.valueOf(foodItem.getPromoPrice()))
                 .add("promo_status", foodItem.getPromoStatus())
                 .build();
         System.out.println("body: "+body);

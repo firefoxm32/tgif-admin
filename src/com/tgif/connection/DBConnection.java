@@ -22,7 +22,7 @@ public class DBConnection {
     private Statement sql;
 //    private ResultSet resultSet;
     private DatabaseMetaData dbmd;
-    private String hostName = "localhost";
+    private String hostName = "192.168.43.152";
     private String databaseName = "tgifriday_db";
     private String userName = "root";
     private String password = "root";

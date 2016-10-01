@@ -13,8 +13,13 @@ import com.tgif.model.Serving;
 import com.tgif.model.SideDish;
 import java.awt.event.KeyEvent;
 import static java.awt.image.ImageObserver.WIDTH;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
@@ -37,6 +42,7 @@ public class FormFoodItem extends javax.swing.JDialog {
     private List<Integer> rServingIds;
     private List<Integer> rSauceIds;
     private List<Integer> rSideDishIds;
+//    private DecimalFormat formatter = new DecimalFormat("#,##0.00");
 
     public void setFoodItem(FoodItem foodItem) {
         this.foodItem = foodItem;
@@ -69,6 +75,12 @@ public class FormFoodItem extends javax.swing.JDialog {
             jComboBoxCategory.setSelectedItem(this.foodItem.getCategory().getName());
             jTextFieldimage.setText(this.foodItem.getImage());
             jTextAreaDescription.setText(this.foodItem.getDescription());
+            if (this.foodItem.getPromoStatus().equalsIgnoreCase("I")) {
+                jRadioButtonNotPromo.setSelected(true);
+            } else {
+                jRadioButtonPromo.setSelected(true);
+            }
+
             this.formAction = "edit";
 
             FoodItemsDao foodItemsDao = new FoodItemsDao();
@@ -105,6 +117,7 @@ public class FormFoodItem extends javax.swing.JDialog {
                     jListSideDish.setModel(listSideDishes);
                 }
             }
+
             rServingIds = new ArrayList<>();
             rSauceIds = new ArrayList<>();
             rSideDishIds = new ArrayList<>();
@@ -122,6 +135,7 @@ public class FormFoodItem extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jTextFieldName = new javax.swing.JTextField();
@@ -156,8 +170,12 @@ public class FormFoodItem extends javax.swing.JDialog {
         jButtonRemovePrice = new javax.swing.JButton();
         jButtonRemoveSauce = new javax.swing.JButton();
         jButtonRemoveSideDish = new javax.swing.JButton();
+        jLabel10 = new javax.swing.JLabel();
+        jRadioButtonPromo = new javax.swing.JRadioButton();
+        jRadioButtonNotPromo = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -173,7 +191,7 @@ public class FormFoodItem extends javax.swing.JDialog {
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 60, 23));
 
         jTextFieldimage.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jPanel1.add(jTextFieldimage, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 460, 500, 30));
+        jPanel1.add(jTextFieldimage, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 430, 430, 30));
 
         jComboBoxCategory.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jComboBoxCategory.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select Category" }));
@@ -186,14 +204,15 @@ public class FormFoodItem extends javax.swing.JDialog {
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel4.setText("Description:");
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 500, 80, 23));
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 510, 70, 23));
 
         jTextAreaDescription.setColumns(20);
         jTextAreaDescription.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jTextAreaDescription.setLineWrap(true);
         jTextAreaDescription.setRows(5);
         jScrollPane1.setViewportView(jTextAreaDescription);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 530, 500, 70));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 510, 430, 70));
 
         jButtonSave.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jButtonSave.setText("Save");
@@ -202,7 +221,7 @@ public class FormFoodItem extends javax.swing.JDialog {
                 jButtonSaveActionPerformed(evt);
             }
         });
-        jPanel1.add(jButtonSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 610, 80, 30));
+        jPanel1.add(jButtonSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 590, 80, 30));
 
         jButtonCancel.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jButtonCancel.setText("Cancel");
@@ -211,7 +230,7 @@ public class FormFoodItem extends javax.swing.JDialog {
                 jButtonCancelActionPerformed(evt);
             }
         });
-        jPanel1.add(jButtonCancel, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 610, 80, 30));
+        jPanel1.add(jButtonCancel, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 590, 80, 30));
 
         jComboBoxCategoryId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select Category Id" }));
         jPanel1.add(jComboBoxCategoryId, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 80, 320, -1));
@@ -219,7 +238,7 @@ public class FormFoodItem extends javax.swing.JDialog {
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel5.setText("Image:");
-        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 430, 60, 23));
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 430, 60, 30));
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel6.setText("Serving:");
@@ -272,22 +291,22 @@ public class FormFoodItem extends javax.swing.JDialog {
         jListServing.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane2.setViewportView(jListServing);
 
-        jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 160, 190, 50));
+        jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 150, 190, 60));
 
         jListPrice.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane3.setViewportView(jListPrice);
 
-        jPanel1.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 230, 190, 50));
+        jPanel1.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 220, 190, 60));
 
         jListSauce.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane4.setViewportView(jListSauce);
 
-        jPanel1.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 300, 190, 50));
+        jPanel1.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 290, 190, 60));
 
         jListSideDish.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane5.setViewportView(jListSideDish);
 
-        jPanel1.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 370, 190, 50));
+        jPanel1.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 360, 190, 60));
 
         jButtonRemoveServing.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jButtonRemoveServing.setText("-");
@@ -296,7 +315,7 @@ public class FormFoodItem extends javax.swing.JDialog {
                 jButtonRemoveServingActionPerformed(evt);
             }
         });
-        jPanel1.add(jButtonRemoveServing, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 160, 40, 50));
+        jPanel1.add(jButtonRemoveServing, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 150, 40, 60));
 
         jButtonRemovePrice.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jButtonRemovePrice.setText("-");
@@ -305,7 +324,7 @@ public class FormFoodItem extends javax.swing.JDialog {
                 jButtonRemovePriceActionPerformed(evt);
             }
         });
-        jPanel1.add(jButtonRemovePrice, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 230, 40, 50));
+        jPanel1.add(jButtonRemovePrice, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 220, 40, 60));
 
         jButtonRemoveSauce.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jButtonRemoveSauce.setText("-");
@@ -314,7 +333,7 @@ public class FormFoodItem extends javax.swing.JDialog {
                 jButtonRemoveSauceActionPerformed(evt);
             }
         });
-        jPanel1.add(jButtonRemoveSauce, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 300, 40, 50));
+        jPanel1.add(jButtonRemoveSauce, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 290, 40, 60));
 
         jButtonRemoveSideDish.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jButtonRemoveSideDish.setText("-");
@@ -323,7 +342,21 @@ public class FormFoodItem extends javax.swing.JDialog {
                 jButtonRemoveSideDishActionPerformed(evt);
             }
         });
-        jPanel1.add(jButtonRemoveSideDish, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 370, 40, 50));
+        jPanel1.add(jButtonRemoveSideDish, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 360, 40, 60));
+
+        jLabel10.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel10.setText("Promo:");
+        jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 470, 60, 30));
+
+        buttonGroup1.add(jRadioButtonPromo);
+        jRadioButtonPromo.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jRadioButtonPromo.setText("Promo");
+        jPanel1.add(jRadioButtonPromo, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 470, -1, 30));
+
+        buttonGroup1.add(jRadioButtonNotPromo);
+        jRadioButtonNotPromo.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jRadioButtonNotPromo.setText("Not Promo");
+        jPanel1.add(jRadioButtonNotPromo, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 470, -1, 30));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -333,9 +366,7 @@ public class FormFoodItem extends javax.swing.JDialog {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 645, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 629, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -346,10 +377,10 @@ public class FormFoodItem extends javax.swing.JDialog {
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
     private void jButtonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSaveActionPerformed
-        if (this.itemNames.contains(jTextFieldName.getText().toLowerCase()) && this.formAction.equalsIgnoreCase("add")) {
-            JOptionPane.showMessageDialog(this, "Item name already exist");
-            return;
-        }
+//        if (this.itemNames.contains(jTextFieldName.getText().toLowerCase()) && this.formAction.equalsIgnoreCase("add")) {
+//            JOptionPane.showMessageDialog(this, "Item name already exist");
+//            return;
+//        }
         if (jTextFieldName.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Enter item name");
             jTextFieldName.requestFocus();
@@ -365,6 +396,8 @@ public class FormFoodItem extends javax.swing.JDialog {
         } else if (jTextFieldimage.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Select item image");
             jTextFieldimage.requestFocus();
+        } else if (jRadioButtonNotPromo.isSelected() == false && jRadioButtonPromo.isSelected() == false) {
+            JOptionPane.showMessageDialog(this, "Select if promo or not");
         } else if (jTextAreaDescription.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Enter description");
             jTextAreaDescription.requestFocus();
@@ -460,6 +493,11 @@ public class FormFoodItem extends javax.swing.JDialog {
                             rSideDishId += rSideDishIds.get(i) + ",";
                         }
                         _rSideDishId = rSideDishId.substring(0, rSideDishId.length() - 1);
+                    }
+                    if (jRadioButtonNotPromo.isSelected()) {
+                        localFoodItem.setPromoStatus("I");
+                    } else {
+                        localFoodItem.setPromoStatus("A");
                     }
                     localFoodItem.setrServingId(_rServId);
                     localFoodItem.setrSauceId(_rSauceId);
@@ -638,6 +676,7 @@ public class FormFoodItem extends javax.swing.JDialog {
      * @param args the command line arguments
      */
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonRemovePrice;
     private javax.swing.JButton jButtonRemoveSauce;
@@ -647,6 +686,7 @@ public class FormFoodItem extends javax.swing.JDialog {
     private javax.swing.JComboBox jComboBoxCategory;
     private javax.swing.JComboBox jComboBoxCategoryId;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -659,6 +699,8 @@ public class FormFoodItem extends javax.swing.JDialog {
     private javax.swing.JList jListServing;
     private javax.swing.JList jListSideDish;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JRadioButton jRadioButtonNotPromo;
+    private javax.swing.JRadioButton jRadioButtonPromo;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;

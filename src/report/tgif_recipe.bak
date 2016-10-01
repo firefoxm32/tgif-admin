@@ -28,8 +28,11 @@
 	<parameter name="transaction_id" isForPrompting="true" class="java.lang.String">
 		<defaultValueExpression ><![CDATA["2dfe4038-c371-4290-8a70-b86d833fb0c2"]]></defaultValueExpression>
 	</parameter>
+	<parameter name="senior_status" isForPrompting="false" class="java.lang.String"/>
 	<queryString><![CDATA[SELECT fi.`item_name` as name, fp.`price` as p, od.`quantity` as qty, od.`transaction_id` as tId,
-ch.`cash_amount` as amount, ch.`transaction_date` as tDate, tm.`table_number`as tNum, ch.`cashier_id` as cId
+ch.`cash_amount` as amount, ch.`transaction_date` as tDate, 
+tm.`table_number`as tNum, ch.`cashier_id` as cId,
+ch.`member_id`
 FROM `order_detail` od
 LEFT JOIN `food_items` fi ON fi.`item_id` = od.`item_id`
 LEFT JOIN `food_serving` fs ON fs.`serving_id` = od.`serving_id`
@@ -46,6 +49,7 @@ WHERE od.`transaction_id` = $P{transaction_id}]]></queryString>
 	<field name="tDate" class="java.sql.Timestamp"/>
 	<field name="tNum" class="java.lang.Integer"/>
 	<field name="cId" class="java.lang.String"/>
+	<field name="member_id" class="java.lang.String"/>
 
 	<variable name="sub_total" class="java.lang.Double" resetType="Report" calculation="Sum">
 		<variableExpression><![CDATA[new Double(  ($F{p}.doubleValue()) *($F{qty}.intValue()) )]]></variableExpression>
@@ -63,18 +67,24 @@ WHERE od.`transaction_id` = $P{transaction_id}]]></queryString>
 		<initialValueExpression><![CDATA[new SimpleDateFormat("M/dd/yy HH:mm a").format(new Date())]]></initialValueExpression>
 	</variable>
 	<variable name="service_charge" class="java.lang.Double" resetType="Report" calculation="Nothing">
-		<variableExpression><![CDATA[new java.lang.Double(0.07 * (($F{p}.doubleValue()) * ($F{qty}.doubleValue())))]]></variableExpression>
+		<variableExpression><![CDATA[new java.lang.Double(  ($V{sub_total}.doubleValue()) *0.03 )]]></variableExpression>
 		<initialValueExpression><![CDATA[new java.lang.Double(0.00)]]></initialValueExpression>
 	</variable>
 	<variable name="senior_citizen" class="java.lang.Double" resetType="Report" calculation="Nothing">
-		<variableExpression><![CDATA[new java.lang.Double(  (($V{sub_total}.doubleValue()) *(0.20)) * -1 )]]></variableExpression>
+		<variableExpression><![CDATA[$P{senior_status} == "senior" ?
+new java.lang.Double(  (($V{sub_total}.doubleValue()) *(0.20)) * -1 )
+:
+new java.lang.Double( 0.00 )]]></variableExpression>
 		<initialValueExpression><![CDATA[new java.lang.Double( 0.00)]]></initialValueExpression>
 	</variable>
 	<variable name="member" class="java.lang.Double" resetType="Report" calculation="Nothing">
-		<variableExpression><![CDATA[$V{current_day} == "Monday" ?
-new java.lang.Double(  (($V{sub_total}.doubleValue()) *(0.30)) * -1 )
+		<variableExpression><![CDATA[!$F{member_id}.toString().equalsIgnoreCase("null") ?
+	$V{current_day} == "Monday" ?
+	new java.lang.Double(  (($V{sub_total}.doubleValue()) *(0.30)) * -1 )
+		:
+	new java.lang.Double(  (($V{sub_total}.doubleValue()) *(0.20)) * -1 )
 :
-new java.lang.Double(  (($V{sub_total}.doubleValue()) *(0.20)) * -1 )]]></variableExpression>
+new java.lang.Double(0.00)]]></variableExpression>
 		<initialValueExpression><![CDATA[new java.lang.Double(0.00)]]></initialValueExpression>
 	</variable>
 	<variable name="current_day" class="java.lang.String" resetType="Report" calculation="Nothing">
@@ -85,7 +95,7 @@ new java.lang.Double(  (($V{sub_total}.doubleValue()) *(0.20)) * -1 )]]></variab
 		<initialValueExpression><![CDATA[new java.lang.Double(0.00)]]></initialValueExpression>
 	</variable>
 	<variable name="total" class="java.lang.Double" resetType="Report" calculation="Nothing">
-		<variableExpression><![CDATA[new java.lang.Double( $V{sub_total}.doubleValue() + ($V{senior_citizen}.doubleValue() +$V{member}.doubleValue()) )]]></variableExpression>
+		<variableExpression><![CDATA[new java.lang.Double( $V{sub_total}.doubleValue() + $V{service_charge}.doubleValue() + ($V{senior_citizen}.doubleValue() +$V{member}.doubleValue()) )]]></variableExpression>
 		<initialValueExpression><![CDATA[new java.lang.Double(0.00)]]></initialValueExpression>
 	</variable>
 	<variable name="sub_total1" class="java.lang.Double" resetType="Report" calculation="Nothing">

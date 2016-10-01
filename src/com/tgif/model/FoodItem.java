@@ -26,7 +26,7 @@ public class FoodItem {
     private String rServingId;
     private String rSauceId;
     private String rSideDishId;
-    private Double promoPrice;
+    private String status;
     private String promoStatus;
     private Category category;
     private List<Serving> servings;
@@ -176,21 +176,21 @@ public class FoodItem {
     public void setrSideDishId(String rSideDishId) {
         this.rSideDishId = rSideDishId;
     }
-
-    public Double getPromoPrice() {
-        return promoPrice;
-    }
-
-    public void setPromoPrice(Double promoPrice) {
-        this.promoPrice = promoPrice;
-    }
-
+    
     public String getPromoStatus() {
         return promoStatus;
     }
 
     public void setPromoStatus(String promoStatus) {
         this.promoStatus = promoStatus;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
     
 }
