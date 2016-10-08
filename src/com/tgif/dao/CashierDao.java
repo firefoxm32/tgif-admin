@@ -38,7 +38,7 @@ public class CashierDao {
         List<Table> list = new ArrayList<>();
         //build url with query param (optional)
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/get-table-status.php")
                 .build();
 
@@ -74,7 +74,7 @@ public class CashierDao {
         List<TransactionDetail> list = new ArrayList<>();
         //build url with query param (optional)
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/get-transaction-details.php")
                 .addQueryParameter("table_number", String.valueOf(tableNumber))
                 .build();
@@ -100,6 +100,8 @@ public class CashierDao {
                 Double credit = object.getDouble("credit");
                 Double cash = object.getDouble("cash");
                 String memberId = object.get("member_id").toString();
+                String ccName = object.getString("credit_card_name");
+                String ccNumber = object.getString("credit_card_number");
                 
                 int qty = object.getInt("quantity");
 
@@ -141,6 +143,8 @@ public class CashierDao {
                 transactionDetail.setSideDish(sideDish);
                 transactionDetail.setSauce(sauces);
                 transactionDetail.setMemberId(memberId);
+                transactionDetail.setCcName(ccName);
+                transactionDetail.setCcNumber(ccNumber);
                 list.add(transactionDetail);
             }
         } catch (Exception e) {
@@ -150,11 +154,6 @@ public class CashierDao {
     }
 
     public void save(TransactionHeader transactionHeader) {
-        System.out.println("cid: "+transactionHeader.getCashierId());
-        System.out.println("tid: "+transactionHeader.getTransactionId());
-        System.out.println("tn: "+transactionHeader.getTableNumber());
-        System.out.println("ca: "+transactionHeader.getCashAmount());
-        //post param
         RequestBody body = new FormBody.Builder()
                 .add("cashier_id", transactionHeader.getCashierId())
                 .add("transaction_id", transactionHeader.getTransactionId())
@@ -164,7 +163,7 @@ public class CashierDao {
                 .build();
         //build url
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/check-out.php")
                 .build();
 

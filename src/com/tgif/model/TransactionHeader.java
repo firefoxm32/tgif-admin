@@ -20,6 +20,24 @@ public class TransactionHeader {
     private Double seniorDiscount;
     private Double memberDiscount;
     private String memberId;
+    private String ccNumber;
+    private String ccName;
+
+    public String getCcNumber() {
+        return ccNumber;
+    }
+
+    public void setCcNumber(String ccNumber) {
+        this.ccNumber = ccNumber;
+    }
+
+    public String getCcName() {
+        return ccName;
+    }
+
+    public void setCcName(String ccName) {
+        this.ccName = ccName;
+    }
 
     public String getMemberId() {
         return memberId;

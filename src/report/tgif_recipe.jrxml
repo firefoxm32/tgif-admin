@@ -28,11 +28,11 @@
 	<parameter name="transaction_id" isForPrompting="true" class="java.lang.String">
 		<defaultValueExpression ><![CDATA["2dfe4038-c371-4290-8a70-b86d833fb0c2"]]></defaultValueExpression>
 	</parameter>
-	<parameter name="senior_status" isForPrompting="false" class="java.lang.String"/>
 	<queryString><![CDATA[SELECT fi.`item_name` as name, fp.`price` as p, od.`quantity` as qty, od.`transaction_id` as tId,
 ch.`cash_amount` as amount, ch.`transaction_date` as tDate, 
 tm.`table_number`as tNum, ch.`cashier_id` as cId,
-ch.`member_id`
+ch.`member_id`, ch.`or_number`, ch.`credit_card_number` as cNumber,
+ch.`senior_citizen_discount` as scd, ch.`membership_discount` as md
 FROM `order_detail` od
 LEFT JOIN `food_items` fi ON fi.`item_id` = od.`item_id`
 LEFT JOIN `food_serving` fs ON fs.`serving_id` = od.`serving_id`
@@ -50,6 +50,10 @@ WHERE od.`transaction_id` = $P{transaction_id}]]></queryString>
 	<field name="tNum" class="java.lang.Integer"/>
 	<field name="cId" class="java.lang.String"/>
 	<field name="member_id" class="java.lang.String"/>
+	<field name="or_number" class="java.lang.String"/>
+	<field name="cNumber" class="java.lang.String"/>
+	<field name="scd" class="java.lang.Double"/>
+	<field name="md" class="java.lang.Double"/>
 
 	<variable name="sub_total" class="java.lang.Double" resetType="Report" calculation="Sum">
 		<variableExpression><![CDATA[new Double(  ($F{p}.doubleValue()) *($F{qty}.intValue()) )]]></variableExpression>
@@ -71,10 +75,6 @@ WHERE od.`transaction_id` = $P{transaction_id}]]></queryString>
 		<initialValueExpression><![CDATA[new java.lang.Double(0.00)]]></initialValueExpression>
 	</variable>
 	<variable name="senior_citizen" class="java.lang.Double" resetType="Report" calculation="Nothing">
-		<variableExpression><![CDATA[$P{senior_status} == "senior" ?
-new java.lang.Double(  (($V{sub_total}.doubleValue()) *(0.20)) * -1 )
-:
-new java.lang.Double( 0.00 )]]></variableExpression>
 		<initialValueExpression><![CDATA[new java.lang.Double( 0.00)]]></initialValueExpression>
 	</variable>
 	<variable name="member" class="java.lang.Double" resetType="Report" calculation="Nothing">
@@ -95,7 +95,7 @@ new java.lang.Double(0.00)]]></variableExpression>
 		<initialValueExpression><![CDATA[new java.lang.Double(0.00)]]></initialValueExpression>
 	</variable>
 	<variable name="total" class="java.lang.Double" resetType="Report" calculation="Nothing">
-		<variableExpression><![CDATA[new java.lang.Double( $V{sub_total}.doubleValue() + $V{service_charge}.doubleValue() + ($V{senior_citizen}.doubleValue() +$V{member}.doubleValue()) )]]></variableExpression>
+		<variableExpression><![CDATA[new java.lang.Double(  ($V{sub_total}.doubleValue() + $V{service_charge}.doubleValue()) -($F{scd}.doubleValue() + $F{md}.doubleValue()) )]]></variableExpression>
 		<initialValueExpression><![CDATA[new java.lang.Double(0.00)]]></initialValueExpression>
 	</variable>
 	<variable name="sub_total1" class="java.lang.Double" resetType="Report" calculation="Nothing">
@@ -365,7 +365,7 @@ Serial No: XXXXXXXX]]></text>
 					<textElement>
 						<font size="18"/>
 					</textElement>
-				<textFieldExpression   class="java.lang.String"><![CDATA[$V{or_no}]]></textFieldExpression>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{or_number}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
@@ -521,7 +521,7 @@ Serial No: XXXXXXXX]]></text>
 			</band>
 		</detail>
 		<columnFooter>
-			<band height="195"  isSplitAllowed="true" >
+			<band height="207"  isSplitAllowed="true" >
 				<staticText>
 					<reportElement
 						x="0"
@@ -624,7 +624,7 @@ Serial No: XXXXXXXX]]></text>
 					<textElement textAlignment="Right">
 						<font size="8"/>
 					</textElement>
-				<textFieldExpression   class="java.lang.Double"><![CDATA[$V{senior_citizen}]]></textFieldExpression>
+				<textFieldExpression   class="java.lang.Double"><![CDATA[new java.lang.Double(  ($F{scd}.doubleValue()) *-1 )]]></textFieldExpression>
 				</textField>
 				<staticText>
 					<reportElement
@@ -650,7 +650,7 @@ Serial No: XXXXXXXX]]></text>
 					<textElement textAlignment="Right">
 						<font size="8"/>
 					</textElement>
-				<textFieldExpression   class="java.lang.Double"><![CDATA[$V{member}]]></textFieldExpression>
+				<textFieldExpression   class="java.lang.Double"><![CDATA[new java.lang.Double(  ($F{md}.doubleValue()) * -1 )]]></textFieldExpression>
 				</textField>
 				<staticText>
 					<reportElement
@@ -676,12 +676,12 @@ Serial No: XXXXXXXX]]></text>
 					<textElement textAlignment="Right">
 						<font size="8"/>
 					</textElement>
-				<textFieldExpression   class="java.lang.Double"><![CDATA[$V{total}]]></textFieldExpression>
+				<textFieldExpression   class="java.lang.Double"><![CDATA[new java.lang.Double(  ($V{sub_total}.doubleValue() + $V{service_charge}.doubleValue()) -($F{scd}.doubleValue() + $F{md}.doubleValue()) )]]></textFieldExpression>
 				</textField>
 				<staticText>
 					<reportElement
 						x="1"
-						y="78"
+						y="89"
 						width="67"
 						height="11"
 						key="staticText-38"/>
@@ -694,7 +694,7 @@ Serial No: XXXXXXXX]]></text>
 				<staticText>
 					<reportElement
 						x="1"
-						y="89"
+						y="100"
 						width="67"
 						height="11"
 						key="staticText-39"/>
@@ -707,7 +707,7 @@ Serial No: XXXXXXXX]]></text>
 				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						x="122"
-						y="78"
+						y="90"
 						width="78"
 						height="11"
 						key="textField-14"/>
@@ -720,7 +720,7 @@ Serial No: XXXXXXXX]]></text>
 				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						x="122"
-						y="89"
+						y="101"
 						width="78"
 						height="11"
 						key="textField-15"/>
@@ -733,7 +733,7 @@ Serial No: XXXXXXXX]]></text>
 				<staticText>
 					<reportElement
 						x="0"
-						y="101"
+						y="112"
 						width="200"
 						height="11"
 						key="staticText-40"/>
@@ -746,7 +746,7 @@ Serial No: XXXXXXXX]]></text>
 				<staticText>
 					<reportElement
 						x="0"
-						y="112"
+						y="124"
 						width="200"
 						height="72"
 						key="staticText-41"/>
@@ -765,7 +765,7 @@ Serial No: XXXXXXX]]></text>
 				<staticText>
 					<reportElement
 						x="0"
-						y="184"
+						y="196"
 						width="200"
 						height="11"
 						key="staticText-42"/>
@@ -775,6 +775,32 @@ Serial No: XXXXXXX]]></text>
 					</textElement>
 				<text><![CDATA[---------------------------------------------------------------------------]]></text>
 				</staticText>
+				<staticText>
+					<reportElement
+						x="1"
+						y="78"
+						width="67"
+						height="11"
+						key="staticText-43"/>
+					<box></box>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="8" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Credit Card #]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="122"
+						y="78"
+						width="78"
+						height="12"
+						key="textField"/>
+					<box></box>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{cNumber}]]></textFieldExpression>
+				</textField>
 			</band>
 		</columnFooter>
 		<pageFooter>

@@ -5,6 +5,7 @@
 package com.tgif.apps;
 
 import com.tgif.dao.CashierDao;
+import com.tgif.dao.UserDao;
 import com.tgif.model.Table;
 import com.tgif.util.Task;
 import com.tgif.util.TaskRunner;
@@ -38,6 +39,15 @@ public class Cashier extends javax.swing.JFrame {
     private TaskRunner taskRunner;
     private CashierDao cashierDao;
     private int x;
+    private String username;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     /**
      * Creates new form Kitchen
@@ -64,6 +74,14 @@ public class Cashier extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -82,6 +100,16 @@ public class Cashier extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        new UserDao().logout(getUsername());
+    }//GEN-LAST:event_formWindowClosing
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        new UserDao().logout(getUsername());
+        Login login = new Login(this, true);
+        login.setVisible(true);
+    }//GEN-LAST:event_formWindowClosed
     protected JPanel jPanelMenu;
 
     private void gridLayout(int size) {
@@ -114,7 +142,6 @@ public class Cashier extends javax.swing.JFrame {
 
             jPanel1.add(jpanel2[i]);
         }
-//        jPanel1.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         clickedTable();
         threading();
@@ -172,69 +199,17 @@ public class Cashier extends javax.swing.JFrame {
                     if (jLabelstatus[myIndex].getText().equalsIgnoreCase("Waiting") || jLabelstatus[myIndex].getText().equalsIgnoreCase("Occupied")) {
                         JOptionPane.showMessageDialog(null, "Not Check Out");
                     } else {
-                        callForm(myIndex + 1);
+                        callForm(myIndex + 1, getUsername());
                     }
                 }
             });
         }
     }
 
-    private void callForm(int tableNumber) {
-        taskRunner.destroy();
-        FormTransactionDetail form = new FormTransactionDetail(this, true, tableNumber);
+    private void callForm(int tableNumber, String user) {
+        FormTransactionDetail form = new FormTransactionDetail(this, true, tableNumber, user);
         form.setLocationRelativeTo(null);
         form.setVisible(true);
-        taskRunner.run();
-    }
-
-    private static void setSystemLookAndFeel() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-
-
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Cashier.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Cashier.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Cashier.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Cashier.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                setSystemLookAndFeel();
-                new Cashier().setVisible(true);
-            }
-        });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;

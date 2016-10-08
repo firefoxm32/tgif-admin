@@ -14,7 +14,33 @@ public class OrderDetail {
     private int id;
     private int tableNumber;
     private int qty;
+    private String readyStatus;
+    private String status;
+    private String orderType;
 
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
+    }
+    
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    
+    public String getReadyStatus() {
+        return readyStatus;
+    }
+
+    public void setReadyStatus(String readyStatus) {
+        this.readyStatus = readyStatus;
+    }
     public int getQty() {
         return qty;
     }

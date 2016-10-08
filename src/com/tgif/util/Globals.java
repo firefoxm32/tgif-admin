@@ -10,8 +10,8 @@ package com.tgif.util;
  */
 public class Globals {
 //    public static String ipaddress; 192.168.1.104
-    private static String ip="192.168.43.89";
-    
-    public static final String URI = "http://"+ip+"/tgif-api/api/";
-    public static final String IMAGE_URI = "http://"+ip+"/tgif-api/api/admin/upload-file.php";
+    public static String ip="";
+    public static final String HTTP = "http://";
+    public static final String URI = "/tgif-api/api/";
+    public static final String IMAGE_URI = "/tgif-api/api/admin/upload-file.php";
 }

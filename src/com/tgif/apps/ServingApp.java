@@ -4,7 +4,9 @@
  */
 package com.tgif.apps;
 
+import com.sun.rowset.internal.Row;
 import com.tgif.dao.ServeDao;
+import com.tgif.dao.UserDao;
 import com.tgif.model.OrderDetail;
 import com.tgif.util.TableManager;
 import com.tgif.util.Task;
@@ -27,17 +29,28 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 
 /**
  *
  * @author Mon
  */
 public class ServingApp extends javax.swing.JFrame {
+
     public static Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    private String[] header = {"ID", "Item Description", "Qty"};
-    private boolean[] cellEditable = {false, false, false};
-    private int[] width = {40, 338, 72};
+    private String[] header = {"ID", "Item Description", "Qty", "Type","status"};
+    private boolean[] cellEditable = {false, false, false, false, false};
+    private int[] width = {40, 260, 50, 50, 50};
+    private String username;
+    private int rowExist;
+    
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     /**
      * Creates new form ServingApp
      */
@@ -46,7 +59,6 @@ public class ServingApp extends javax.swing.JFrame {
         setExtendedState(MAXIMIZED_BOTH);
         gridLayout();
     }
-    
     protected JPanel[] jpanel2;
     protected JTable[] jTables;
     protected JLabel[] jLabels;
@@ -76,10 +88,10 @@ public class ServingApp extends javax.swing.JFrame {
             jScrollPanes[i].add(jTables[i]);
 
             TableManager.setModel(jTables[i], jScrollPanes[i], null, header, false, false, 0, cellEditable, width);
-            
+
             jTables[i].setGridColor(Color.BLACK);
             jTables[i].setAlignmentX(CENTER_ALIGNMENT);
-            jTables[i].setFont(new Font("Tahoma", Font.PLAIN, 22));
+            jTables[i].setFont(new Font("Tahoma", Font.PLAIN, 16));
             jTables[i].setMaximumSize(new Dimension(getMaximumSize().width, getMaximumSize().height));
             jTables[i].setRowHeight(jTables[i].getRowHeight() * 2);
             jLabels[i].setOpaque(true);
@@ -107,10 +119,10 @@ public class ServingApp extends javax.swing.JFrame {
         btnClickListener(jTables.length);
         this.pack();
     }
-    
+
     private void threading() {
         taskRunner.setTask(new ServingApp.TaskOrder());
-        taskRunner.setDelay(2000);
+        taskRunner.setDelay(1000);
         taskRunner.run();
     }
 
@@ -123,39 +135,54 @@ public class ServingApp extends javax.swing.JFrame {
                 getOrders(String.valueOf(x), jTables[i]);
             }
         }
-    } 
+    }
 
     private void getOrders(String tableNumber, JTable table) {
-        System.out.println("here");
+        System.out.println("GET");
         ServeDao serveDao = new ServeDao();
         List<OrderDetail> orderDetail = serveDao.getDetailOrders(tableNumber);
-        System.out.println("size:: "+orderDetail.size());
         for (int x = 0; x < orderDetail.size(); x++) {
             String sauces = "";
             for (int i = 0; i < orderDetail.get(x).getSauces().size(); i++) {
                 sauces += orderDetail.get(x).getSauces().get(i).getAbbreviation() + ", ";
             }
-            String subSauces="";
-            if(!sauces.isEmpty()) {
+            String subSauces = "";
+            if (!sauces.isEmpty()) {
                 subSauces = sauces.substring(0, sauces.length() - 2);
             }
             String description = orderDetail.get(x).getServing().getAbbreviation()
                     + ", Sauce/s: " + subSauces
                     + ", Side Dish: " + orderDetail.get(x).getSideDish().getAbbreviation();
+            String readyStatus = (orderDetail.get(x).getReadyStatus().equalsIgnoreCase("R")) ? "R" : "NR";
+            System.out.println("Ordes: "+orderDetail);
             if (!isDataExist(orderDetail.get(x).getId(), table)) {
                 TableManager.getTableModel(table).addRow(new Object[]{
                     orderDetail.get(x).getId(),
                     orderDetail.get(x).getFoodItem().getItemName() + ", Serving: "
                     + description,
-                    orderDetail.get(x).getQty()
+                    orderDetail.get(x).getQty(), 
+                    orderDetail.get(x).getOrderType(), 
+                    readyStatus
                 });
+            } else {
+                System.out.println("exist, changing status now");
+                int row = rowExist;
+                System.out.println("row:"+row);
+                String status = table.getValueAt(row, 4).toString();
+                System.out.println("current status:"+status);
+                System.out.println("updated status:"+readyStatus);
+                if(!status.equalsIgnoreCase(readyStatus)) {
+                    table.setValueAt(readyStatus, row, 4);
+                }
             }
+            
         }
     }
 
     private boolean isDataExist(int id, JTable table) {
         for (int y = 0; y < table.getRowCount(); y++) {
             if (table.getValueAt(y, 0).equals(id)) {
+                rowExist = y;
                 return true;
             }
         }
@@ -177,36 +204,42 @@ public class ServingApp extends javax.swing.JFrame {
                 public void mouseClicked(MouseEvent me) {
                     super.mouseClicked(me); //To change body of generated methods, choose Tools | Templates.
                     int row = jTables[x].getSelectedRow();
-                    System.out.println("row: " + row);
                     if (row == -1) {
-                        joption(x + 1);
+                        joption("Select item in table " + (x + 1) + " to serve");
                         return;
                     }
-                    System.out.println("ids: "+jTables[x].getValueAt(row, 0).toString());
+                    String isReady = jTables[x].getValueAt(row, 3).toString();
+                    if (isReady.equalsIgnoreCase("NR")) {
+                        joption("This food not yet ready");
+                        return;
+                    }
+                    if (confirmation() == 1) {
+                        return;
+                    }
                     serveOrder(Integer.valueOf(jTables[x].getValueAt(row, 0).toString()));
                     TableManager.getTableModel(jTables[x]).removeRow(row);
                 }
             });
         }
     }
-
-    private void joption(int pos) {
-        JOptionPane.showMessageDialog(this, "Select item in table " + pos + " to serve");
+    
+    private void joption(String message) {
+        JOptionPane.showMessageDialog(this, message);
     }
-
+    private Integer confirmation() {
+        int res=JOptionPane.showConfirmDialog(this, "Serve this order?", "Confirmation", JOptionPane.YES_NO_OPTION);
+        System.out.println("RES: "+res);
+        if(res == JOptionPane.NO_OPTION) {
+            return res;
+        }
+            
+        return res;
+    }
     private void serveOrder(int item_id) {
         ServeDao serveDao = new ServeDao();
         serveDao.edit(String.valueOf(item_id));
     }
 
-    private static void setSystemLookAndFeel() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -220,6 +253,14 @@ public class ServingApp extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -246,41 +287,16 @@ public class ServingApp extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        new UserDao().logout(getUsername());
+    }//GEN-LAST:event_formWindowClosing
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        new UserDao().logout(getUsername());
+    }//GEN-LAST:event_formWindowClosed
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ServingApp.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ServingApp.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ServingApp.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ServingApp.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                setSystemLookAndFeel();
-                new ServingApp().setVisible(true);
-            }
-        });
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables

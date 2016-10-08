@@ -30,9 +30,8 @@ public class CategoryDao {
     public List<Category> getMenusData(String param) {
         List<Category> list = new ArrayList();
         //build url with query param (optional)
-        System.out.println("URI: "+Globals.URI);
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/get-food-menus.php")
                 .addQueryParameter("param", param)
                 .build();
@@ -85,7 +84,7 @@ public class CategoryDao {
                 .build();
         //build url
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/add-edit-delete-food-category.php")
                 .build();
 

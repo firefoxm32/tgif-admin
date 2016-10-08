@@ -29,7 +29,7 @@ public class MembershipDAO {
         List<Membership> list = new ArrayList();
         //build url with query param (optional)
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/get-members.php")
                 .build();
 
@@ -83,7 +83,7 @@ public class MembershipDAO {
                 .build();
         //build url
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/add-edit-membership.php")
                 .build();
 

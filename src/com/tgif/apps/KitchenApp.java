@@ -5,6 +5,7 @@
 package com.tgif.apps;
 
 import com.tgif.dao.ServeDao;
+import com.tgif.dao.UserDao;
 import com.tgif.model.OrderDetail;
 import com.tgif.util.TableManager;
 import com.tgif.util.Task;
@@ -16,15 +17,18 @@ import java.awt.Font;
 import static java.awt.Frame.MAXIMIZED_BOTH;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 
 /**
  *
@@ -33,9 +37,19 @@ import javax.swing.UIManager;
 public class KitchenApp extends javax.swing.JFrame {
 
     public static Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    private String[] header = {"ID", "Item Description", "Qty"};
-    private boolean[] cellEditable = {false, false, false};
-    private int[] width = {35, 353, 62};
+    private String[] header = {"ID", "Item Description", "Qty", "Type","Status"};
+    private boolean[] cellEditable = {false, false, false, false};
+    private int[] width = {40, 260, 50, 50,50};
+    private String username;
+    private int existRow;
+    
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     /**
      * Creates new form KitchenApp
@@ -48,7 +62,7 @@ public class KitchenApp extends javax.swing.JFrame {
     protected JPanel[] jpanel2;
     protected JTable[] jTables;
     protected JLabel[] jLabels;
-//    protected JButton[] jButtons;
+    protected JButton[] jButtons;
     protected JScrollPane[] jScrollPanes;
     private TaskRunner taskRunner = new TaskRunner();
 
@@ -56,7 +70,7 @@ public class KitchenApp extends javax.swing.JFrame {
         jpanel2 = new JPanel[6];
         jTables = new JTable[6];
         jLabels = new JLabel[6];
-//        jButtons = new JButton[6];
+        jButtons = new JButton[6];
         jScrollPanes = new JScrollPane[6];
 
         GridLayout gLayout = new GridLayout(2, 3);
@@ -67,6 +81,7 @@ public class KitchenApp extends javax.swing.JFrame {
         for (int i = 0; i < 6; i++) {
             jpanel2[i] = new JPanel();
             jTables[i] = new JTable();
+            jButtons[i] = new JButton();
             jLabels[i] = new JLabel("Table #" + (i + 1), SwingConstants.CENTER);
             jScrollPanes[i] = new JScrollPane();
             jpanel2[i].setLayout(new BoxLayout(jpanel2[i], BoxLayout.Y_AXIS));
@@ -78,29 +93,36 @@ public class KitchenApp extends javax.swing.JFrame {
             jLabels[i].setBackground(Color.YELLOW);
             jLabels[i].setMaximumSize(new Dimension(getMaximumSize().width, getMinimumSize().height));
 
+            jButtons[i].setText("Ready");
+            jButtons[i].setAlignmentX(CENTER_ALIGNMENT);
+            jButtons[i].setFont(new Font("Tahoma", Font.BOLD, 22));
+            jButtons[i].setMaximumSize(new Dimension(getMaximumSize().width, 40));
+
             TableManager.setModel(jTables[i], jScrollPanes[i], null, header, false, false, 0, cellEditable, width);
 
             jTables[i].setGridColor(Color.BLACK);
             jTables[i].setAlignmentX(CENTER_ALIGNMENT);
-            jTables[i].setFont(new Font("Tahoma", Font.PLAIN, 22));
+            jTables[i].setFont(new Font("Tahoma", Font.PLAIN, 16));
             jTables[i].setMaximumSize(new Dimension(getMaximumSize().width, getMaximumSize().height));
             jTables[i].setRowHeight(jTables[i].getRowHeight() * 2);
 
             jpanel2[i].add(jLabels[i]);
             jpanel2[i].add(jScrollPanes[i]);
+            jpanel2[i].add(jButtons[i]);
             jpanel2[i].setBackground(Color.GRAY);
 
             jPanel1.add(jpanel2[i]);
         }
 
         threading();
-
+        btnClickListener(jTables.length);
+        jtableClickListner(jTables.length);
         this.pack();
     }
 
     private void threading() {
         taskRunner.setTask(new KitchenApp.TaskOrder());
-        taskRunner.setDelay(2000);
+        taskRunner.setDelay(1000);
         taskRunner.run();
     }
 
@@ -117,7 +139,7 @@ public class KitchenApp extends javax.swing.JFrame {
     protected JTextArea jTextArea;
 
     private void getOrders(String tableNumber, JTable table) {
-        TableManager.getTableModel(table).setNumRows(0);
+//        TableManager.getTableModel(table).setNumRows(0);
         jTextArea = new JTextArea();
         jTextArea.setLineWrap(true);
         ServeDao serveDao = new ServeDao();
@@ -135,34 +157,115 @@ public class KitchenApp extends javax.swing.JFrame {
                     + orderDetail.get(x).getServing().getAbbreviation()
                     + ", Sauce/s: " + subSauces
                     + ", Side Dish: " + orderDetail.get(x).getSideDish().getAbbreviation();
-//            jTextArea.setText(description);
-//            if (!isDataExist(orderDetail.get(x).getId(), table)) {
-            TableManager.getTableModel(table).addRow(new Object[]{
-                orderDetail.get(x).getId(),
-                description,
-                orderDetail.get(x).getQty()
+            String serveStatus = (orderDetail.get(x).getReadyStatus().equalsIgnoreCase("R")) ? "R" : "NR";
+            String orderType = (orderDetail.get(x).getOrderType().equalsIgnoreCase("DI")) ? "D.I" : "T.O";
+            if (!isDataExist(orderDetail.get(x), table)) {
+                TableManager.getTableModel(table).addRow(new Object[]{
+                    orderDetail.get(x).getId(),
+                    description,
+                    orderDetail.get(x).getQty(),
+                    orderType,
+                    serveStatus
+                });
+            }
+        }
+        updateTable(orderDetail, table);
+    }
+    int j;
+    private void joption(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
+    
+    private void btnClickListener(int size) {
+        for (j = 0; j < size; j++) {
+
+            jButtons[j].addMouseListener(new MouseAdapter() {
+                int x;
+
+                {
+                    x = j;
+                }
+
+                @Override
+                public void mouseClicked(MouseEvent me) {
+                    super.mouseClicked(me); //To change body of generated methods, choose Tools | Templates.
+                    int row = jTables[x].getSelectedRow();
+                    System.out.println("row: " + row);
+                    if (row == -1) {
+                        joption("Select item in table " + (x + 1) + " to ready");
+                        return;
+                    }
+                    int id = Integer.valueOf(jTables[x].getValueAt(row, 0).toString());
+                    if (jButtons[x].getText().equalsIgnoreCase("Ready")) {
+                        new ServeDao().updateServeStatus("R", id);
+                    } else {
+                        new ServeDao().updateServeStatus("N", id);
+                    }
+                    
+//                    serveOrder(Integer.valueOf(jTables[x].getValueAt(row, 0).toString()));
+                    TableManager.getTableModel(jTables[x]).removeRow(row);
+                }
             });
-//            }
         }
     }
-
-    private boolean isDataExist(int id, JTable table) {
+        int s;
+    private void jtableClickListner(int size) {
+        for(s = 0; s < size; s++) {
+            jTables[s].addMouseListener(new MouseAdapter() {
+                int x;
+                {x=s;}
+                @Override
+                public void mouseClicked(MouseEvent me) {
+                    super.mouseClicked(me); //To change body of generated methods, choose Tools | Templates.
+                    int row = jTables[x].getSelectedRow();
+                    String status = jTables[x].getValueAt(row, 3).toString();
+                    System.out.println("status: "+status);
+                    if (status.equalsIgnoreCase("R")) {
+                        jButtons[x].setText("Not Ready");
+                    } else {
+                        jButtons[x].setText("Ready");
+                    }
+                    jButtons[x].repaint();
+                }
+            });
+        }
+    }
+    
+    private boolean isDataExist(OrderDetail od, JTable table) {
         for (int y = 0; y < table.getRowCount(); y++) {
-            if (table.getValueAt(y, 0).equals(id)) {
+            if (table.getValueAt(y, 0).equals(od.getId())) {
                 return true;
             }
         }
         return false;
     }
 
-    private static void setSystemLookAndFeel() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void updateTable(List<OrderDetail> ods, JTable jTable) {
+        for (int y = 0; y < jTable.getRowCount(); y++) {
+            int id = Integer.valueOf(jTable.getValueAt(y, 0).toString());
+            boolean isOnList = isOnList(id, ods);
+            System.out.println("checker:"+isOnList);
+            if(!isOnList) {
+                System.out.println("remove:"+id);
+                TableManager.getTableModel(jTable).removeRow(y);
+            }
         }
+//        if (ods.isEmpty()) {
+//            TableManager.getTableModel(jTable).setNumRows(0);
+//        }
     }
-
+    
+    private boolean isOnList(int id, List<OrderDetail> ods) {
+        for (int y = 0; y < ods.size(); y++) {
+            if (ods.get(y).getId() == id) {
+                existRow = y;
+                return true;
+            }
+        }
+        return false;
+    }
+        
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -176,6 +279,14 @@ public class KitchenApp extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -202,41 +313,16 @@ public class KitchenApp extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        new UserDao().logout(getUsername());
+    }//GEN-LAST:event_formWindowClosing
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        new UserDao().logout(getUsername());
+    }//GEN-LAST:event_formWindowClosed
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(KitchenApp.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(KitchenApp.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(KitchenApp.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(KitchenApp.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                setSystemLookAndFeel();
-                new KitchenApp().setVisible(true);
-            }
-        });
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables

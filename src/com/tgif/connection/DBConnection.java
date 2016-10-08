@@ -5,6 +5,7 @@
 package com.tgif.connection;
 
 
+import com.tgif.util.Globals;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -22,7 +23,7 @@ public class DBConnection {
     private Statement sql;
 //    private ResultSet resultSet;
     private DatabaseMetaData dbmd;
-    private String hostName = "192.168.43.152";
+    private String host = "localhost";
     private String databaseName = "tgifriday_db";
     private String userName = "root";
     private String password = "root";
@@ -31,7 +32,7 @@ public class DBConnection {
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            db = DriverManager.getConnection("jdbc:mysql://" + hostName + "/" + databaseName, userName, password);
+            db = DriverManager.getConnection("jdbc:mysql://" + host + "/" + databaseName, userName, password);
             System.out.println("db: " + db);
             dbmd = db.getMetaData();
             sql = db.createStatement();

@@ -34,7 +34,7 @@ public class FoodItemsDao {
         List<FoodItem> list = new ArrayList();
         //build url with query param (optional)
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/get-food-items.php")
                 .addQueryParameter("field", field)
                 .addQueryParameter("value", value)
@@ -106,7 +106,7 @@ public class FoodItemsDao {
                 .build();
         //build url
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/add-food-item.php")
                 .build();
 
@@ -162,7 +162,7 @@ public class FoodItemsDao {
         System.out.println("body: "+body);
         //build url
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/edit-delete-food-items.php")
                 .build();
 
@@ -201,7 +201,7 @@ public class FoodItemsDao {
         FoodItem foodItem = new FoodItem();
         //build url with query param (optional)
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/get-food-item-details.php")
                 .addQueryParameter("item_id", String.valueOf(param))
                 .build();
@@ -277,7 +277,7 @@ public class FoodItemsDao {
         System.out.println("body: "+body);
         //build url
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/add-edit-promo.php")
                 .build();
 

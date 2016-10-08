@@ -70,6 +70,8 @@ public class FormMemberShipManagement extends javax.swing.JInternalFrame {
         jButtonAdd = new javax.swing.JButton();
         jButtonEdit = new javax.swing.JButton();
 
+        setTitle("Members");
+
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jTextFieldSearch.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N

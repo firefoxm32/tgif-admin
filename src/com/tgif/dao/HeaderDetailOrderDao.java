@@ -37,7 +37,7 @@ public class HeaderDetailOrderDao {
         List<OrderHeader> list = new ArrayList();
         //build url with query param (optional)
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/get-header-orders.php")
                 .build();
 
@@ -82,7 +82,7 @@ public class HeaderDetailOrderDao {
         List<OrderDetail> list = new ArrayList();
         //build url with query param (optional)
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/get-detail-orders.php")
                 .build();
 

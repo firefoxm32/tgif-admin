@@ -55,7 +55,26 @@ public class FormUserManagement extends javax.swing.JInternalFrame {
         UserDao userDao = new UserDao();
         for (User user : userDao.getUserData()) {
             jComboBoxPassword.addItem(String.valueOf(user.getPassword()));
-            String type = user.getUserType().equalsIgnoreCase("m") ? "Mobile" : "Admin";
+//            String type = user.getUserType().equalsIgnoreCase("m") ? "Mobile" : "Admin";
+            String utype = user.getUserType();
+            String type;
+            switch(utype){
+                case "A" : 
+                type = "Admin";
+                break;
+                case "C" :
+                type = "Cashier";
+                break;
+                case "K" :
+                type = "Kitchen";
+                break;
+                case "W" :
+                type = "Waiter";
+                break;
+                default : 
+                type = "Mobile";
+                break;
+            }
             TableManager.getTableModel(jXTableUser).addRow(new Object[]{
                 user.getUsername(),
                 user.getTableNumber(),

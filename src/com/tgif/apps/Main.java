@@ -1,7 +1,9 @@
 package com.tgif.apps;
 
+import com.tgif.dao.UserDao;
 import com.tgif.util.Formatter;
 import com.tgif.view.FormCategoryManagement;
+import com.tgif.view.FormFeedback;
 import com.tgif.view.FormFoodItemManagement;
 import com.tgif.view.FormMemberShipManagement;
 import com.tgif.view.FormUserManagement;
@@ -20,6 +22,17 @@ import javax.swing.UIManager;
  */
 public class Main extends javax.swing.JFrame {
 
+    private String username;
+    private String ip;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+ 
     public static Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
     
     public static JFrame JFParent;
@@ -51,9 +64,19 @@ public class Main extends javax.swing.JFrame {
         jButtonMembership = new javax.swing.JButton();
         jSeparator8 = new javax.swing.JToolBar.Separator();
         jButtonUserManagement = new javax.swing.JButton();
+        jSeparator9 = new javax.swing.JToolBar.Separator();
+        jButtonUserManagement1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("TGIF's System Admin");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jLabelUser.setText("User");
         jXStatusBar1.add(jLabelUser);
@@ -123,6 +146,19 @@ public class Main extends javax.swing.JFrame {
             }
         });
         jToolBar2.add(jButtonUserManagement);
+        jToolBar2.add(jSeparator9);
+
+        jButtonUserManagement1.setText("Feedback");
+        jButtonUserManagement1.setToolTipText("Users");
+        jButtonUserManagement1.setFocusable(false);
+        jButtonUserManagement1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonUserManagement1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButtonUserManagement1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonUserManagement1ActionPerformed(evt);
+            }
+        });
+        jToolBar2.add(jButtonUserManagement1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -161,6 +197,18 @@ public class Main extends javax.swing.JFrame {
         iframeRequest = showWindow(iframeRequest, new FormMemberShipManagement());
     }//GEN-LAST:event_jButtonMembershipActionPerformed
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        new UserDao().logout(getUsername());
+    }//GEN-LAST:event_formWindowClosing
+
+    private void jButtonUserManagement1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUserManagement1ActionPerformed
+        iframeRequest = showWindow(iframeRequest, new FormFeedback());
+    }//GEN-LAST:event_jButtonUserManagement1ActionPerformed
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+       new UserDao().logout(getUsername());
+    }//GEN-LAST:event_formWindowClosed
+
     private void initializeStatusBar() {
         Date sysDate = new Date();
         SYSTEM_DATE = sysDate;
@@ -180,14 +228,6 @@ public class Main extends javax.swing.JFrame {
             ex.printStackTrace();
         }
         return ip;
-    }
-    private static void setSystemLookAndFeel() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public static JInternalFrame showWindow(JInternalFrame iFrame, JInternalFrame newFrame) {
@@ -238,20 +278,12 @@ public class Main extends javax.swing.JFrame {
 
         return iFrame;
     }
-
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                setSystemLookAndFeel();
-                new Main().setVisible(true);
-            }
-        });
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonCategoryManagement;
     private javax.swing.JButton jButtonFoodManagement;
     private javax.swing.JButton jButtonMembership;
     private javax.swing.JButton jButtonUserManagement;
+    private javax.swing.JButton jButtonUserManagement1;
     private javax.swing.JLabel jLabelDivision;
     private javax.swing.JLabel jLabelIpAddress;
     public static javax.swing.JLabel jLabelSystemDate;
@@ -261,6 +293,7 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JToolBar.Separator jSeparator6;
     private javax.swing.JToolBar.Separator jSeparator7;
     private javax.swing.JToolBar.Separator jSeparator8;
+    private javax.swing.JToolBar.Separator jSeparator9;
     private javax.swing.JToolBar jToolBar2;
     private org.jdesktop.swingx.JXStatusBar jXStatusBar1;
     // End of variables declaration//GEN-END:variables

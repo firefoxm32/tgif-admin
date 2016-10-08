@@ -4,9 +4,11 @@
  */
 package com.tgif.dao;
 
+import com.mysql.jdbc.interceptors.SessionAssociationInterceptor;
 import com.tgif.model.Category;
 import com.tgif.model.User;
 import com.tgif.util.Globals;
+import com.tgif.util.SharedPrefs;
 import com.tgif.util.URLBuilder;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +32,7 @@ public class UserDao {
         List<User> list = new ArrayList();
         //build url with query param (optional)
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/get-users.php")
                 .build();
 
@@ -117,6 +119,81 @@ public class UserDao {
             } else {
                 JOptionPane.showMessageDialog(null, message);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public User login(User user) {
+        User u = user;
+        RequestBody body = new FormBody.Builder()
+                .add("username", user.getUsername())
+                .add("password", user.getPassword())
+                .add("user_type", user.getUserType())
+                .build();
+        //build url
+        String url = new URLBuilder()
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
+                .addPathSegment("login.php")
+                .build();
+
+        //build post request
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+
+        try {
+            //execute request
+            Response response = client.newCall(request).execute();
+            //response call
+            String result = response.body().string();
+            //parse result to json
+            JSONObject jsonData = new JSONObject(result);
+
+            //display
+            String status = jsonData.getString("status");
+            String message = jsonData.getString("message");
+
+            System.out.println("status:" + status);
+            System.out.println("message:" + message);
+            
+            user.setUserType(jsonData.getString("user_type"));
+            if ("error".equals(status)) {
+                JOptionPane.showMessageDialog(null, message);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return u;
+    }
+    
+    public void logout(String username) {
+        RequestBody body = new FormBody.Builder()
+                .add("username", username)
+                .build();
+        //build url
+        String url = new URLBuilder()
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
+                .addPathSegment("logout.php")
+                .build();
+
+        //build post request
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        try {
+            //execute request
+            Response response = client.newCall(request).execute();
+            //response call
+            String result = response.body().string();
+            //parse result to json
+            JSONObject jsonData = new JSONObject(result);
+
+            //display
+            String status = jsonData.getString("status");
+            System.out.println("status: "+status);
         } catch (Exception e) {
             e.printStackTrace();
         }
