@@ -7,6 +7,7 @@ package com.tgif.apps;
 import com.tgif.dao.ServeDao;
 import com.tgif.dao.UserDao;
 import com.tgif.model.OrderDetail;
+import com.tgif.model.User;
 import com.tgif.util.TableManager;
 import com.tgif.util.Task;
 import com.tgif.util.TaskRunner;
@@ -15,7 +16,6 @@ import static java.awt.Component.CENTER_ALIGNMENT;
 import java.awt.Dimension;
 import java.awt.Font;
 import static java.awt.Frame.MAXIMIZED_BOTH;
-import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -39,7 +39,7 @@ public class KitchenApp extends javax.swing.JFrame {
     public static Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
     private String[] header = {"ID", "Item Description", "Qty", "Type","Status"};
     private boolean[] cellEditable = {false, false, false, false};
-    private int[] width = {40, 260, 50, 50,50};
+    private int[] width = {40, 308, 50, 50,50};
     private String username;
     private int existRow;
     
@@ -65,25 +65,28 @@ public class KitchenApp extends javax.swing.JFrame {
     protected JButton[] jButtons;
     protected JScrollPane[] jScrollPanes;
     private TaskRunner taskRunner = new TaskRunner();
+    
+    private int users() {
+        int size = new UserDao().userCount();
+        return size;
+    }
 
     private void gridLayout() {
-        jpanel2 = new JPanel[6];
-        jTables = new JTable[6];
-        jLabels = new JLabel[6];
-        jButtons = new JButton[6];
-        jScrollPanes = new JScrollPane[6];
+        int size = users();
+        jpanel2 = new JPanel[size];
+        jTables = new JTable[size];
+        jLabels = new JLabel[size];
+        jButtons = new JButton[size];
+        jScrollPanes = new JScrollPane[size];
 
-        GridLayout gLayout = new GridLayout(2, 3);
-        gLayout.setHgap(5);
-        gLayout.setVgap(5);
-        jPanel1.setLayout(gLayout);
         jPanel1.setBackground(Color.DARK_GRAY);
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < size; i++) {
             jpanel2[i] = new JPanel();
             jTables[i] = new JTable();
             jButtons[i] = new JButton();
             jLabels[i] = new JLabel("Table #" + (i + 1), SwingConstants.CENTER);
             jScrollPanes[i] = new JScrollPane();
+            jpanel2[i].setPreferredSize(new Dimension(500, 300));
             jpanel2[i].setLayout(new BoxLayout(jpanel2[i], BoxLayout.Y_AXIS));
 
             jScrollPanes[i].add(jTables[i]);
@@ -106,14 +109,19 @@ public class KitchenApp extends javax.swing.JFrame {
             jTables[i].setMaximumSize(new Dimension(getMaximumSize().width, getMaximumSize().height));
             jTables[i].setRowHeight(jTables[i].getRowHeight() * 2);
 
+//            jpanel2[i].setPreferredSize(new Dimension(getMinimumSize().height,getMinimumSize().width + 300));
             jpanel2[i].add(jLabels[i]);
             jpanel2[i].add(jScrollPanes[i]);
             jpanel2[i].add(jButtons[i]);
             jpanel2[i].setBackground(Color.GRAY);
-
+            
             jPanel1.add(jpanel2[i]);
         }
-
+        
+//        JScrollPane jScrollPane = new JScrollPane(jPanel1, 
+//                JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+//                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+//        this.add(jScrollPane);
         threading();
         btnClickListener(jTables.length);
         jtableClickListner(jTables.length);
@@ -190,7 +198,6 @@ public class KitchenApp extends javax.swing.JFrame {
                 public void mouseClicked(MouseEvent me) {
                     super.mouseClicked(me); //To change body of generated methods, choose Tools | Templates.
                     int row = jTables[x].getSelectedRow();
-                    System.out.println("row: " + row);
                     if (row == -1) {
                         joption("Select item in table " + (x + 1) + " to ready");
                         return;
@@ -201,7 +208,6 @@ public class KitchenApp extends javax.swing.JFrame {
                     } else {
                         new ServeDao().updateServeStatus("N", id);
                     }
-                    
 //                    serveOrder(Integer.valueOf(jTables[x].getValueAt(row, 0).toString()));
                     TableManager.getTableModel(jTables[x]).removeRow(row);
                 }
@@ -218,8 +224,7 @@ public class KitchenApp extends javax.swing.JFrame {
                 public void mouseClicked(MouseEvent me) {
                     super.mouseClicked(me); //To change body of generated methods, choose Tools | Templates.
                     int row = jTables[x].getSelectedRow();
-                    String status = jTables[x].getValueAt(row, 3).toString();
-                    System.out.println("status: "+status);
+                    String status = jTables[x].getValueAt(row, 4).toString();
                     if (status.equalsIgnoreCase("R")) {
                         jButtons[x].setText("Not Ready");
                     } else {
@@ -244,9 +249,7 @@ public class KitchenApp extends javax.swing.JFrame {
         for (int y = 0; y < jTable.getRowCount(); y++) {
             int id = Integer.valueOf(jTable.getValueAt(y, 0).toString());
             boolean isOnList = isOnList(id, ods);
-            System.out.println("checker:"+isOnList);
             if(!isOnList) {
-                System.out.println("remove:"+id);
                 TableManager.getTableModel(jTable).removeRow(y);
             }
         }
@@ -275,6 +278,7 @@ public class KitchenApp extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane1 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -288,26 +292,20 @@ public class KitchenApp extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+
+        jPanel1.setLayout(new java.awt.GridLayout(2, 2, 5, 5));
+        jScrollPane1.setViewportView(jPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
 
         pack();
@@ -325,5 +323,6 @@ public class KitchenApp extends javax.swing.JFrame {
      */
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }

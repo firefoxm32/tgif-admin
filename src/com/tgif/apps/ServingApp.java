@@ -39,7 +39,7 @@ public class ServingApp extends javax.swing.JFrame {
     public static Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
     private String[] header = {"ID", "Item Description", "Qty", "Type","status"};
     private boolean[] cellEditable = {false, false, false, false, false};
-    private int[] width = {40, 260, 50, 50, 50};
+    private int[] width = {40, 310, 50, 50, 50};
     private String username;
     private int rowExist;
     
@@ -66,16 +66,19 @@ public class ServingApp extends javax.swing.JFrame {
     protected JScrollPane[] jScrollPanes;
     private TaskRunner taskRunner = new TaskRunner();
 
+    private int users() {
+        int size = new UserDao().userCount();
+        return size;
+    }
+    
     private void gridLayout() {
-        jpanel2 = new JPanel[6];
-        jTables = new JTable[6];
-        jLabels = new JLabel[6];
-        jButtons = new JButton[6];
-        jScrollPanes = new JScrollPane[6];
-        GridLayout gLayout = new GridLayout(2, 3);
-        gLayout.setHgap(5);
-        gLayout.setVgap(5);
-        jPanel1.setLayout(gLayout);
+        int size = users();
+        jpanel2 = new JPanel[size];
+        jTables = new JTable[size];
+        jLabels = new JLabel[size];
+        jButtons = new JButton[size];
+        jScrollPanes = new JScrollPane[size];
+        
         jPanel1.setBackground(Color.DARK_GRAY);
         for (int i = 0; i < 6; i++) {
             jpanel2[i] = new JPanel();
@@ -83,6 +86,7 @@ public class ServingApp extends javax.swing.JFrame {
             jLabels[i] = new JLabel("Table #" + (i + 1), SwingConstants.CENTER);
             jButtons[i] = new JButton();
             jScrollPanes[i] = new JScrollPane();
+            jpanel2[i].setPreferredSize(new Dimension(500, 300));
             jpanel2[i].setLayout(new BoxLayout(jpanel2[i], BoxLayout.Y_AXIS));
 
             jScrollPanes[i].add(jTables[i]);
@@ -138,7 +142,6 @@ public class ServingApp extends javax.swing.JFrame {
     }
 
     private void getOrders(String tableNumber, JTable table) {
-        System.out.println("GET");
         ServeDao serveDao = new ServeDao();
         List<OrderDetail> orderDetail = serveDao.getDetailOrders(tableNumber);
         for (int x = 0; x < orderDetail.size(); x++) {
@@ -154,7 +157,6 @@ public class ServingApp extends javax.swing.JFrame {
                     + ", Sauce/s: " + subSauces
                     + ", Side Dish: " + orderDetail.get(x).getSideDish().getAbbreviation();
             String readyStatus = (orderDetail.get(x).getReadyStatus().equalsIgnoreCase("R")) ? "R" : "NR";
-            System.out.println("Ordes: "+orderDetail);
             if (!isDataExist(orderDetail.get(x).getId(), table)) {
                 TableManager.getTableModel(table).addRow(new Object[]{
                     orderDetail.get(x).getId(),
@@ -165,12 +167,8 @@ public class ServingApp extends javax.swing.JFrame {
                     readyStatus
                 });
             } else {
-                System.out.println("exist, changing status now");
                 int row = rowExist;
-                System.out.println("row:"+row);
                 String status = table.getValueAt(row, 4).toString();
-                System.out.println("current status:"+status);
-                System.out.println("updated status:"+readyStatus);
                 if(!status.equalsIgnoreCase(readyStatus)) {
                     table.setValueAt(readyStatus, row, 4);
                 }
@@ -208,7 +206,7 @@ public class ServingApp extends javax.swing.JFrame {
                         joption("Select item in table " + (x + 1) + " to serve");
                         return;
                     }
-                    String isReady = jTables[x].getValueAt(row, 3).toString();
+                    String isReady = jTables[x].getValueAt(row, 4).toString();
                     if (isReady.equalsIgnoreCase("NR")) {
                         joption("This food not yet ready");
                         return;
@@ -228,7 +226,6 @@ public class ServingApp extends javax.swing.JFrame {
     }
     private Integer confirmation() {
         int res=JOptionPane.showConfirmDialog(this, "Serve this order?", "Confirmation", JOptionPane.YES_NO_OPTION);
-        System.out.println("RES: "+res);
         if(res == JOptionPane.NO_OPTION) {
             return res;
         }
@@ -249,6 +246,7 @@ public class ServingApp extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane1 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -262,26 +260,20 @@ public class ServingApp extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+
+        jPanel1.setLayout(new java.awt.GridLayout(2, 2, 5, 5));
+        jScrollPane1.setViewportView(jPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
         );
 
         pack();
@@ -299,5 +291,6 @@ public class ServingApp extends javax.swing.JFrame {
      */
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }

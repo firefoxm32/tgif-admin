@@ -198,4 +198,31 @@ public class UserDao {
             e.printStackTrace();
         }
     }
+    
+    public int userCount() {
+        int rows = 0;
+        
+        String url = new URLBuilder()
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
+                .addPathSegment("admin/get-user-counter.php")
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            String result = response.body().string();
+            JSONObject jsonData = new JSONObject(result);
+
+            String status = jsonData.getString("status");
+            int size = jsonData.getInt("size");
+            rows = size;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return rows;
+    }
 }

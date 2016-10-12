@@ -10,7 +10,9 @@ import com.tgif.dao.ServeDao;
 import com.tgif.model.TransactionDetail;
 import com.tgif.model.TransactionHeader;
 import com.tgif.util.TableManager;
+import java.awt.Event;
 import java.awt.Font;
+import java.awt.event.KeyEvent;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,13 +30,14 @@ import net.sf.jasperreports.view.JasperViewer;
  */
 public class FormTransactionDetail extends javax.swing.JDialog {
 //    private String transactionId;
-    
+
     private String[] header = {"Detail", "price", "quantity"};
     private boolean[] cellEditable = {false, false, false};
     private int[] width = {578, 100, 100};
     JasperReport jasperReport;
     JasperPrint jasperPrint;
     private String uName;
+
     /**
      * Creates new form FormTransactionDetail
      */
@@ -61,7 +64,6 @@ public class FormTransactionDetail extends javax.swing.JDialog {
 
     private void getTransactionDetails() {
         double credit = 0.0;
-        double cash = 0.0;
         CashierDao cashierDao = new CashierDao();
         TableManager.getTableModel(jTableTransactionDetails).setRowCount(0);
         for (TransactionDetail detail : cashierDao.getTransactionDetails(Integer.valueOf(jLabelTableNumber.getText()))) {
@@ -70,7 +72,7 @@ public class FormTransactionDetail extends javax.swing.JDialog {
             jLabelNumber.setText(detail.getCcNumber());
             String sauce = "";
             credit = detail.getCredit();
-            cash = detail.getCash();
+//            cash = detail.getCash();
             memberId = detail.getMemberId();
             for (int i = 0; i < detail.getSauce().size(); i++) {
                 sauce += detail.getSauce().get(i).getSauceName() + ", ";
@@ -92,31 +94,34 @@ public class FormTransactionDetail extends javax.swing.JDialog {
                 detail.getQuantity()
             });
         }
-        cashAmount = cash;
+//        cashAmount = cash;
         subTotal = credit;
-        payments(0);
+        payments(0, 0);
     }
     private double memberDiscount;
     private double serviceCharge;
     private double total;
     private double change;
+    private DecimalFormat formatter = new DecimalFormat("#,##0.00");
 
-    private void payments(double sDiscount) {
-        DecimalFormat formatter = new DecimalFormat("#,##0.00");
+    private void payments(double sDiscount, double cash) {
         jLabelSubTotal.setText(formatter.format(subTotal));
         SimpleDateFormat dateFormatter = new SimpleDateFormat("EEEE");
         String d = dateFormatter.format(new Date());
-        System.out.println("d: "+d);
-        System.out.println("MEMBER ID: "+memberId);
+        System.out.println("d: " + d);
+        System.out.println("MEMBER ID: " + memberId);
         if (!memberId.trim().isEmpty()) {
+            jCheckBox1.setEnabled(false);
             if (d.equalsIgnoreCase("Monday")) {
                 memberDiscount = subTotal * .30;
-                System.out.println("MONDAY: "+memberDiscount);
+                System.out.println("MONDAY: " + memberDiscount);
             } else {
                 memberDiscount = subTotal * .20;
-                System.out.println("NOT MONDAY: "+memberDiscount);
+                System.out.println("NOT MONDAY: " + memberDiscount);
             }
         }
+        
+
         serviceCharge = subTotal * .03;
         jLabelMembershipDiscount.setText(formatter.format(memberDiscount * -1));
         jLabelSeniorDiscount.setText(formatter.format(sDiscount * -1));
@@ -124,9 +129,16 @@ public class FormTransactionDetail extends javax.swing.JDialog {
 
         total = subTotal + serviceCharge - memberDiscount - sDiscount;
         jLabelTotal.setText(formatter.format(total));
-        jLabelCash.setText(formatter.format(cashAmount));
-        change = cashAmount - total;
-        jLabelChange.setText(formatter.format(change));
+//        jLabelCash.setText(formatter.format(cashAmount));
+
+        if (!jLabelHolderName.getText().trim().isEmpty()) {
+            jTextFieldCash.setEnabled(false);
+        } else {
+            jTextFieldCash.setEnabled(true);
+            change = cash - total;
+            cashAmount = cash;
+            jLabelChange.setText(formatter.format(change));
+        }
     }
 
     /**
@@ -165,6 +177,7 @@ public class FormTransactionDetail extends javax.swing.JDialog {
         jLabelNumber = new javax.swing.JLabel();
         jLabelHolderName = new javax.swing.JLabel();
         jButtonCancelPayment = new javax.swing.JButton();
+        jTextFieldCash = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(1105, 555));
@@ -202,7 +215,7 @@ public class FormTransactionDetail extends javax.swing.JDialog {
         jLabelCash.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabelCash.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabelCash.setText("0.00");
-        jPanel1.add(jLabelCash, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 330, 160, 30));
+        jPanel1.add(jLabelCash, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 480, 160, 30));
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         jLabel5.setText("Sub Total Bill:");
@@ -313,6 +326,23 @@ public class FormTransactionDetail extends javax.swing.JDialog {
         });
         jPanel1.add(jButtonCancelPayment, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 480, 150, 40));
 
+        jTextFieldCash.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jTextFieldCash.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextFieldCash.setText("0.00");
+        jTextFieldCash.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
+            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
+                jTextFieldCashInputMethodTextChanged(evt);
+            }
+        });
+        jTextFieldCash.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextFieldCashKeyPressed(evt);
+            }
+        });
+        jPanel1.add(jTextFieldCash, new org.netbeans.lib.awtextra.AbsoluteConstraints(149, 330, 160, 30));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -369,21 +399,32 @@ public class FormTransactionDetail extends javax.swing.JDialog {
     private void jCheckBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox1ItemStateChanged
         if (jCheckBox1.isSelected()) {
             seniorDiscount = subTotal * .20;
-            payments(seniorDiscount);
+            payments(seniorDiscount, 0);
         } else {
             seniorDiscount = 0;
-            payments(seniorDiscount);
+            payments(seniorDiscount, 0);
         }
     }//GEN-LAST:event_jCheckBox1ItemStateChanged
 
     private void jTextFieldTransactionIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldTransactionIdActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_jTextFieldTransactionIdActionPerformed
 
     private void jButtonCancelPaymentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelPaymentActionPerformed
         new ServeDao().cancelPayment(jTextFieldTransactionId.getText());
         dispose();
     }//GEN-LAST:event_jButtonCancelPaymentActionPerformed
+
+    private void jTextFieldCashInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_jTextFieldCashInputMethodTextChanged
+        double cash = Double.valueOf(jTextFieldCash.getText().trim());
+        payments(seniorDiscount, cash);
+    }//GEN-LAST:event_jTextFieldCashInputMethodTextChanged
+
+    private void jTextFieldCashKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextFieldCashKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            double cash = Double.valueOf(jTextFieldCash.getText().trim());
+            payments(seniorDiscount, cash);
+        }
+    }//GEN-LAST:event_jTextFieldCashKeyPressed
     private void printReport() {
 
         try {
@@ -446,6 +487,7 @@ public class FormTransactionDetail extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTableTransactionDetails;
+    private javax.swing.JTextField jTextFieldCash;
     private javax.swing.JTextField jTextFieldTransactionId;
     // End of variables declaration//GEN-END:variables
 }

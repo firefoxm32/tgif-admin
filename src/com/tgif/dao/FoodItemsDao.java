@@ -68,7 +68,7 @@ public class FoodItemsDao {
                     String itemStatus = object.getString("status");
                     String description = String.valueOf(object.get("description"));
                     String promoStatus = object.getString("promo_status");
-                    
+
                     FoodItem foodItem = new FoodItem();
 
                     Category category = new Category();
@@ -141,25 +141,35 @@ public class FoodItemsDao {
     }
 
     public void editDelete(FoodItem foodItem, String action) {
+//        System.out.println("FOODITEM: "+foodItem.getItemName());
         //post param
-        RequestBody body = new FormBody.Builder()
-                .add("item_id", String.valueOf(foodItem.getItemId()))
-                .add("menu_id", String.valueOf(foodItem.getCategory().getId()))
-                .add("item_name", foodItem.getItemName())
-                .add("image", foodItem.getImage())
-                .add("description", foodItem.getDescription())
-                .add("serving_name", foodItem.getServingName())
-                .add("price", foodItem.getPrice())
-                .add("sauce_name", foodItem.getSauceName())
-                .add("side_dish_name", foodItem.getSideDishName())
-                .add("serving_id", foodItem.getServingId())
-                .add("sauce_id", foodItem.getSauceId())
-                .add("side_dish_id", foodItem.getSideDishId())
-                .add("r_serving_id", foodItem.getrServingId())
-                .add("r_sauce_id", foodItem.getrSauceId())
-                .add("r_side_dish_id", foodItem.getrSideDishId())
-                .add("action", action).build();
-        System.out.println("body: "+body);
+        RequestBody body = null;
+        if (action.equalsIgnoreCase("delete")) {
+            body = new FormBody.Builder()
+                    .add("item_id", String.valueOf(foodItem.getItemId()))
+                    .add("action", action).build();
+        } else {
+            body = new FormBody.Builder()
+                    .add("item_id", String.valueOf(foodItem.getItemId()))
+                    .add("menu_id", String.valueOf(foodItem.getCategory().getId()))
+                    .add("item_name", foodItem.getItemName())
+                    .add("image", foodItem.getImage())
+                    .add("description", foodItem.getDescription())
+                    .add("serving_name", foodItem.getServingName())
+                    .add("price", foodItem.getPrice())
+                    .add("sauce_name", foodItem.getSauceName())
+                    .add("side_dish_name", foodItem.getSideDishName())
+                    .add("serving_id", foodItem.getServingId())
+                    .add("sauce_id", foodItem.getSauceId())
+                    .add("side_dish_id", foodItem.getSideDishId())
+                    .add("r_serving_id", foodItem.getrServingId())
+                    .add("r_sauce_id", foodItem.getrSauceId())
+                    .add("r_side_dish_id", foodItem.getrSideDishId())
+                    .add("action", action).build();
+        }
+
+
+        System.out.println("body: " + body);
         //build url
         String url = new URLBuilder()
                 .host(Globals.HTTP + Globals.ip + Globals.URI)
@@ -219,7 +229,7 @@ public class FoodItemsDao {
             JSONObject json = jsonData.getJSONObject("item");
             if (json != null) {
                 List<Serving> servings = new ArrayList<>();
-                System.out.println("servings: "+json.get("servings"));
+                System.out.println("servings: " + json.get("servings"));
                 if (!json.get("servings").toString().equalsIgnoreCase("null")) {
                     JSONArray arrServings = json.getJSONArray("servings");
                     for (int i = 0; i < arrServings.length(); i++) {
@@ -271,10 +281,10 @@ public class FoodItemsDao {
     public void addEditPromo(FoodItem foodItem) {
         RequestBody body = new FormBody.Builder()
                 .add("item_id", String.valueOf(foodItem.getItemId()))
-//                .add("promo_price", String.valueOf(foodItem.getPromoPrice()))
+                //                .add("promo_price", String.valueOf(foodItem.getPromoPrice()))
                 .add("promo_status", foodItem.getPromoStatus())
                 .build();
-        System.out.println("body: "+body);
+        System.out.println("body: " + body);
         //build url
         String url = new URLBuilder()
                 .host(Globals.HTTP + Globals.ip + Globals.URI)

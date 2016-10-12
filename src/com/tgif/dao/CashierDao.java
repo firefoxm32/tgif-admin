@@ -98,7 +98,6 @@ public class CashierDao {
                 Date dateOrder = formatter.parse(String.valueOf(object.get("date_order")));
                 Double price = object.getDouble("price");
                 Double credit = object.getDouble("credit");
-                Double cash = object.getDouble("cash");
                 String memberId = object.get("member_id").toString();
                 String ccName = object.getString("credit_card_name");
                 String ccNumber = object.getString("credit_card_number");
@@ -136,7 +135,6 @@ public class CashierDao {
                 transactionDetail.setDateOrder(dateOrder);
                 transactionDetail.setPrice(price);
                 transactionDetail.setCredit(credit);
-                transactionDetail.setCash(cash);
                 transactionDetail.setQuantity(qty);
                 transactionDetail.setFoodItem(foodItem);
                 transactionDetail.setServing(serving);

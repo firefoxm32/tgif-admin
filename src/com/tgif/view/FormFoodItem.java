@@ -11,17 +11,18 @@ import com.tgif.model.FoodItem;
 import com.tgif.model.Sauce;
 import com.tgif.model.Serving;
 import com.tgif.model.SideDish;
+import com.tgif.util.Globals;
 import java.awt.event.KeyEvent;
-import static java.awt.image.ImageObserver.WIDTH;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -73,7 +74,9 @@ public class FormFoodItem extends javax.swing.JDialog {
             jTextFieldItemId.setText(String.valueOf(this.foodItem.getItemId()));
             jTextFieldName.setText(this.foodItem.getItemName());
             jComboBoxCategory.setSelectedItem(this.foodItem.getCategory().getName());
-            jTextFieldimage.setText(this.foodItem.getImage());
+//            jTextFieldimage.setText(this.foodItem.getImage());
+            jTextFieldimage.setText(Globals.HTTP + Globals.URI + "/images/" + this.foodItem.getImage());
+            jTextFieldImageName.setText(this.foodItem.getImage());
             jTextAreaDescription.setText(this.foodItem.getDescription());
             if (this.foodItem.getPromoStatus().equalsIgnoreCase("I")) {
                 jRadioButtonNotPromo.setSelected(true);
@@ -136,6 +139,7 @@ public class FormFoodItem extends javax.swing.JDialog {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        jFileChooser1 = new javax.swing.JFileChooser();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jTextFieldName = new javax.swing.JTextField();
@@ -173,6 +177,8 @@ public class FormFoodItem extends javax.swing.JDialog {
         jLabel10 = new javax.swing.JLabel();
         jRadioButtonPromo = new javax.swing.JRadioButton();
         jRadioButtonNotPromo = new javax.swing.JRadioButton();
+        jButtonBrowse = new javax.swing.JButton();
+        jTextFieldImageName = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -191,7 +197,8 @@ public class FormFoodItem extends javax.swing.JDialog {
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 60, 23));
 
         jTextFieldimage.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jPanel1.add(jTextFieldimage, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 430, 430, 30));
+        jTextFieldimage.setEnabled(false);
+        jPanel1.add(jTextFieldimage, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 430, 350, 30));
 
         jComboBoxCategory.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jComboBoxCategory.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select Category" }));
@@ -358,6 +365,16 @@ public class FormFoodItem extends javax.swing.JDialog {
         jRadioButtonNotPromo.setText("Not Promo");
         jPanel1.add(jRadioButtonNotPromo, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 470, -1, 30));
 
+        jButtonBrowse.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jButtonBrowse.setText("Browse");
+        jButtonBrowse.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonBrowseActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButtonBrowse, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 430, -1, 30));
+        jPanel1.add(jTextFieldImageName, new org.netbeans.lib.awtextra.AbsoluteConstraints(359, 470, 150, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -448,7 +465,17 @@ public class FormFoodItem extends javax.swing.JDialog {
                 category.setId(Integer.valueOf(jComboBoxCategoryId.getSelectedItem().toString()));
                 localFoodItem.setCategory(category);
                 if (this.formAction.equals("add")) {
-                    foodItemsDao.add(localFoodItem);
+                    try {
+                        if (createDir()) {
+                            if (copyPasteImage()) {
+                                foodItemsDao.add(localFoodItem);
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Cannot create directory");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 } else {
                     String servingId = "";
                     String servId = "";
@@ -650,6 +677,49 @@ public class FormFoodItem extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jButtonRemoveSideDishActionPerformed
 
+    private void jButtonBrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonBrowseActionPerformed
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("images", "jpg", "png");
+        jFileChooser1.setFileFilter(filter);
+        int value = jFileChooser1.showOpenDialog(null);
+        if (value == JFileChooser.APPROVE_OPTION) {
+            jTextFieldimage.setText(jFileChooser1.getSelectedFile().getAbsolutePath());
+            jTextFieldImageName.setText(jFileChooser1.getSelectedFile().getName());
+        }
+    }//GEN-LAST:event_jButtonBrowseActionPerformed
+
+    private boolean createDir() {
+//        File dir = new File(Globals.HTTP + Globals.URI + "/images/" + jTextFieldName.getText().trim().toLowerCase());
+        File dir = new File("C:\\xampp\\htdocs\\tgif-api\\images\\"+jTextFieldName.getText().trim().toLowerCase());
+        // attempt to create the directory here
+        boolean successful = dir.mkdir();
+        if (successful) {
+            System.out.println("directory was created successfully");
+            return true;
+        } else {
+            // creating the directory failed
+            System.out.println("failed trying to create the directory");
+            return false;
+        }
+    }
+
+    private boolean copyPasteImage() {
+//        Path path = Paths.get(jTextFieldimage.getText());
+        Path path = Paths.get("C:\\Users\\Mon\\Desktop\\test.png");
+        System.out.println("PATH: "+path);
+        File source = path.toFile();
+        System.out.println("FILE: "+source);
+        File dest = new File("C:\\xampp\\htdocs\\tgif-api\\images\\"+jTextFieldName.getText().trim().toLowerCase()+"\\"+jTextFieldImageName.getText()+"\\");
+        try {
+            Files.copy(source.toPath(), dest.toPath());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("E: "+e.getMessage());
+            JOptionPane.showMessageDialog(this, "Unable to copy file to destination");
+            return false;
+        }
+    }
+
     private void getCategory() {
         CategoryDao categoryDao = new CategoryDao();
         for (Category category : categoryDao.getMenusData("")) {
@@ -677,6 +747,7 @@ public class FormFoodItem extends javax.swing.JDialog {
      */
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton jButtonBrowse;
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonRemovePrice;
     private javax.swing.JButton jButtonRemoveSauce;
@@ -685,6 +756,7 @@ public class FormFoodItem extends javax.swing.JDialog {
     private javax.swing.JButton jButtonSave;
     private javax.swing.JComboBox jComboBoxCategory;
     private javax.swing.JComboBox jComboBoxCategoryId;
+    private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
@@ -707,6 +779,7 @@ public class FormFoodItem extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTextArea jTextAreaDescription;
+    private javax.swing.JTextField jTextFieldImageName;
     private javax.swing.JTextField jTextFieldItemId;
     private javax.swing.JTextField jTextFieldName;
     private javax.swing.JTextField jTextFieldPrice;

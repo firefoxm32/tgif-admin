@@ -57,7 +57,7 @@ public class Cashier extends javax.swing.JFrame {
         setExtendedState(MAXIMIZED_BOTH);
         taskRunner = new TaskRunner();
         cashierDao = new CashierDao();
-        gridLayout(6);
+        gridLayout();
 //        jPanelMenu.setMaximumSize(new Dimension(getMaximumSize().width, 50));
     }
 
@@ -70,6 +70,7 @@ public class Cashier extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane1 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -83,17 +84,18 @@ public class Cashier extends javax.swing.JFrame {
             }
         });
 
-        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jPanel1.setLayout(new java.awt.GridLayout(2, 2, 5, 5));
+        jScrollPane1.setViewportView(jPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 407, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
         );
 
         getAccessibleContext().setAccessibleParent(this);
@@ -111,20 +113,25 @@ public class Cashier extends javax.swing.JFrame {
         login.setVisible(true);
     }//GEN-LAST:event_formWindowClosed
     protected JPanel jPanelMenu;
-
-    private void gridLayout(int size) {
+    
+    private int users() {
+        int size = new UserDao().userCount();
+        return size;
+    }
+    
+    private void gridLayout() {
+        int size = users();
         jLabelstatus = new JLabel[size];
         jLabeltableNum = new JLabel[size];
-        jpanel2 = new JPanel[6];
+        jpanel2 = new JPanel[size];
 
-        GridLayout gLayout = new GridLayout(2, 3, 5, 5);
-        jPanel1.setLayout(gLayout);
+//        GridLayout gLayout = new GridLayout(2, 3, 5, 5);
+//        jPanel1.setLayout(gLayout);
         jPanel1.setBackground(Color.BLUE);
         for (int i = 0; i < size; i++) {
             jpanel2[i] = new JPanel();
             jLabeltableNum[i] = new JLabel("Table #" + (i + 1), SwingConstants.CENTER);
             jLabelstatus[i] = new JLabel("", SwingConstants.CENTER);
-
             jpanel2[i].setLayout(new BoxLayout(jpanel2[i], BoxLayout.Y_AXIS));
 
             jLabeltableNum[i].setOpaque(true);
@@ -213,5 +220,6 @@ public class Cashier extends javax.swing.JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }
