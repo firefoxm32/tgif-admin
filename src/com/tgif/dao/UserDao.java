@@ -89,7 +89,7 @@ public class UserDao {
                 .build();
         //build url
         String url = new URLBuilder()
-                .host(Globals.URI)
+                .host(Globals.HTTP + Globals.ip + Globals.URI)
                 .addPathSegment("admin/add-user.php")
                 .build();
 

@@ -59,6 +59,7 @@ public class FormFoodItem extends javax.swing.JDialog {
     public FormFoodItem(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        jTextFieldimage.setVisible(false);
         jTextFieldItemId.setVisible(false);
         jComboBoxCategoryId.setVisible(false);
         listServings = new DefaultListModel<>();
@@ -71,6 +72,8 @@ public class FormFoodItem extends javax.swing.JDialog {
 
     public void setData() {
         if (this.foodItem != null) {
+            jTextFieldName.setEnabled(false);
+            jButtonBrowse.setEnabled(false);
             jTextFieldItemId.setText(String.valueOf(this.foodItem.getItemId()));
             jTextFieldName.setText(this.foodItem.getItemName());
             jComboBoxCategory.setSelectedItem(this.foodItem.getCategory().getName());
@@ -198,7 +201,7 @@ public class FormFoodItem extends javax.swing.JDialog {
 
         jTextFieldimage.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jTextFieldimage.setEnabled(false);
-        jPanel1.add(jTextFieldimage, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 430, 350, 30));
+        jPanel1.add(jTextFieldimage, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 470, 170, 30));
 
         jComboBoxCategory.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jComboBoxCategory.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select Category" }));
@@ -373,7 +376,9 @@ public class FormFoodItem extends javax.swing.JDialog {
             }
         });
         jPanel1.add(jButtonBrowse, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 430, -1, 30));
-        jPanel1.add(jTextFieldImageName, new org.netbeans.lib.awtextra.AbsoluteConstraints(359, 470, 150, -1));
+
+        jTextFieldImageName.setEnabled(false);
+        jPanel1.add(jTextFieldImageName, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 430, 370, 30));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -533,7 +538,18 @@ public class FormFoodItem extends javax.swing.JDialog {
                     localFoodItem.setSauceId(sId);
                     localFoodItem.setSideDishId(sdId);
                     localFoodItem.setItemId(Integer.valueOf(jTextFieldItemId.getText()));
-                    foodItemsDao.editDelete(localFoodItem, this.formAction);
+                    
+//                    try {
+//                        if (createDir()) {
+//                            if (copyPasteImage()) {
+                                foodItemsDao.editDelete(localFoodItem, this.formAction);
+//                            }
+//                        } else {
+//                            JOptionPane.showMessageDialog(this, "Cannot create directory");
+//                        }
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
                     this.dispose();
                 }
             }

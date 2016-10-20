@@ -47,6 +47,8 @@ public class FormTransactionDetail extends javax.swing.JDialog {
         this.setTitle("Table " + tableNumber + " Order Details");
         jLabelTableNumber.setText(String.valueOf(tableNumber));
         jButtonCheckOut.requestFocus();
+        jTextFieldTransactionId.setVisible(false);
+        jLabelCash.setVisible(false);
         initTable();
         this.uName = username;
     }
